@@ -119,6 +119,38 @@ button{font:inherit;color:inherit}
 svg text{font-family:var(--body)}
 .src{font-size:12px;color:var(--ink-soft)}
 
+/* Разговор с клиентом */
+.talk-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-bottom:16px}
+.tbox{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:10px}
+.tbox h3{font-size:16px}
+.tbox ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:15px}
+.tbox.pain{border-top:6px solid var(--ink-soft)}
+.tbox.offer{border-top:6px solid var(--accent)}
+.tbox.value{border-top:6px solid var(--good)}
+.tbox.value li::marker{color:var(--good)}
+.price-line{background:var(--navy);color:var(--navy-ink);border-radius:16px;padding:16px 20px;margin-bottom:16px;font-weight:600}
+.price-line b{color:#F59A62}
+.calc{background:var(--card);border:2px solid var(--accent);border-radius:18px;padding:20px;display:flex;flex-direction:column;gap:14px;margin-bottom:14px}
+.calc h3{font-size:18px}
+.calc .hint{margin:0;font-size:14px;color:var(--ink-soft)}
+.fields{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.field{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:700;color:var(--ink-soft)}
+.field .in{display:flex;align-items:center;gap:6px}
+.field input{width:100%;min-width:0;font:inherit;font-size:16px;font-weight:700;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-variant-numeric:tabular-nums}
+.field .u{font-weight:600;white-space:nowrap}
+.field small{font-weight:600;color:var(--accent-ink)}
+.results{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}
+.res{border-radius:14px;padding:12px 14px;background:var(--paper);display:flex;flex-direction:column;gap:4px}
+.res span{font-size:13px;color:var(--ink-soft);font-weight:600}
+.res b{font-family:var(--display);font-size:20px;font-variant-numeric:tabular-nums}
+.res.good b{color:var(--good)}
+.res.bad b{color:#C0392B}
+.res.hi{background:var(--accent-soft)}
+.res.hi b{color:var(--accent-ink)}
+.calc-note{font-size:12px;color:var(--ink-soft)}
+.reset{align-self:flex-start;background:none;border:1px solid var(--line);border-radius:10px;padding:6px 12px;cursor:pointer;font-size:13px;font-weight:700}
+.reset:hover{border-color:var(--accent)}
+
 /* Отёл */
 .ctl{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
 .cstep{background:var(--card);border:1px solid var(--line);border-top:6px solid var(--ink-soft);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:6px}
@@ -177,6 +209,13 @@ footer{background:var(--navy);color:var(--navy-ink);margin-top:30px;padding:28px
 
 <main class="wrap">
   <section id="panel" class="panel" aria-live="polite"></section>
+
+  <section class="tech" id="sales">
+    <h2>Разговор с клиентом: выгода и окупаемость</h2>
+    <p>Выберите направление: боли клиента, что предлагаем, польза в цифрах каталога, ответ на «дорого» и калькулятор на цифрах хозяйства.</p>
+    <div class="tabs" role="tablist" id="talk-tabs" style="padding-top:0"></div>
+    <div id="talk"></div>
+  </section>
 
   <section class="tech" id="calving">
     <h2>Отёл: три недели до и три недели после</h2>
@@ -395,6 +434,34 @@ function drawLactation(){
   svg.innerHTML=g;
   $('#lac-sum').innerHTML=`<div><b style="color:var(--accent-ink)">≈ ${total(A).toLocaleString('ru-RU')} кг</b><br>за 305 дней при пике 65 л — уровень лучших ферм мира; выше порога ${cA?'до ~'+cA+' дня':'всю лактацию'}</div><div><b>≈ ${total(Bc).toLocaleString('ru-RU')} кг</b><br>за 305 дней при пике 40 л; опускается до порога к ~${cB} дню</div>`;
 }
+let talkId='milk';
+function renderTalk(){
+  $('#talk-tabs').innerHTML=TALK.map(t=>`<button class="tab" role="tab" aria-selected="${t.id===talkId}" data-t="${t.id}"><span class="emo" aria-hidden="true">${t.emo}</span>${esc(t.name)}</button>`).join('');
+  $('#talk-tabs').querySelectorAll('.tab').forEach(b=>b.onclick=()=>{talkId=b.dataset.t;renderTalk()});
+  const t=TALK.find(x=>x.id===talkId);
+  let h=`<div class="talk-grid">
+    <div class="tbox pain"><h3>Что болит у клиента</h3><ul>${t.pain.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
+    <div class="tbox offer"><h3>Что предлагаем</h3><p style="margin:0;font-size:15px">${esc(t.offer)}</p></div>
+    <div class="tbox value"><h3>Практическая польза</h3><ul>${t.value.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
+  </div><div class="price-line"><b>Если говорят «дорого»:</b> ${esc(t.price)}</div>`;
+  t.calcs.forEach(id=>{const c=CALCS[id];
+    h+=`<div class="calc" data-c="${id}"><h3>🧮 ${esc(c.title)}</h3><p class="hint">${esc(c.hint)}</p>
+    <div class="fields">${c.f.map(f=>`<label class="field" for="c-${id}-${f[0]}">${esc(f[1])}${f[5]?` <small>${esc(f[5])}</small>`:''}<span class="in"><input id="c-${id}-${f[0]}" type="number" inputmode="decimal" step="${f[3]}" value="${f[2]}" data-k="${f[0]}"><span class="u">${esc(f[4])}</span></span></label>`).join('')}</div>
+    <div class="results" id="r-${id}"></div>
+    <button class="reset" type="button">Вернуть значения по умолчанию</button>
+    <span class="calc-note">Цены по умолчанию — примеры. Подставьте прайс Алникора и цены хозяйства; эффект продукта зависит от рациона и условий.</span></div>`;});
+  $('#talk').innerHTML=h;
+  $('#talk').querySelectorAll('.calc').forEach(box=>{
+    const c=CALCS[box.dataset.c];
+    const calc=()=>{const v={};box.querySelectorAll('input').forEach(i=>v[i.dataset.k]=parseFloat(String(i.value).replace(',','.'))||0);
+      box.querySelector('.results').innerHTML=c.run(v).map(r=>`<div class="res ${r.k||''}"><span>${esc(r.l)}</span><b>${esc(r.v)}</b></div>`).join('')};
+    box.querySelectorAll('input').forEach(i=>i.addEventListener('input',calc));
+    box.querySelector('.reset').onclick=()=>{c.f.forEach(f=>box.querySelector(`[data-k="${f[0]}"]`).value=f[2]);calc()};
+    calc();
+  });
+}
+renderTalk();
+
 drawLactation();
 
 $('#q').addEventListener('input',e=>{state.q=e.target.value.trim();renderTabs();renderPanel()});
