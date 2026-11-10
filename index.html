@@ -217,9 +217,19 @@ svg text{font-family:var(--body)}
 /* КРС: линия этапов */
 .krs-ctrl{display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
 .krs-btns{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.krs-line{overflow-x:auto;margin:16px 0;padding-bottom:6px}
-.krs-track{display:grid;grid-template-columns:repeat(8,minmax(190px,1fr));gap:10px;position:relative;min-width:1560px}
-.krs-track::before{content:"";position:absolute;left:24px;right:24px;top:22px;height:4px;background:linear-gradient(90deg,var(--accent),var(--good));border-radius:2px}
+.krs-line{margin:16px 0}
+.krs-track{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.krs-strip{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;position:relative;margin-bottom:14px}
+.krs-strip::before{content:"";position:absolute;left:4%;right:4%;top:19px;height:4px;background:linear-gradient(90deg,var(--accent),var(--good));border-radius:2px}
+.knode{position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;gap:2px;background:none;border:none;cursor:pointer;padding:0 2px}
+.knode .kn{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:var(--card);border:3px solid var(--line);font-family:var(--display);font-weight:800;color:var(--ink-soft);position:relative;z-index:1}
+.knode.on .kn{border-color:var(--accent);background:var(--accent);color:#fff}
+.knode.best .kn{box-shadow:0 0 0 5px var(--accent-soft)}
+.knode b{font-size:13px;line-height:1.2}
+.knode small{font-size:11px;color:var(--ink-soft)}
+.knode em{font-style:normal;font-size:12px;font-weight:800;color:var(--good)}
+.knode:not(.on) em{color:var(--ink-soft)}
+@media (max-width:760px){.krs-strip{grid-template-columns:repeat(4,1fr);row-gap:14px}.krs-strip::before{display:none}}
 .kst{position:relative;display:flex;flex-direction:column;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px;margin-top:0}
 .kst.best{border:2px solid var(--accent);box-shadow:0 6px 18px rgba(226,98,27,.18)}
 .kdot{width:44px;height:44px;border-radius:50%;background:var(--card);border:3px solid var(--accent);display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:18px;color:var(--accent-ink);position:relative;z-index:1;margin-top:-2px}
@@ -315,7 +325,7 @@ footer{background:var(--navy);color:var(--navy-ink);margin-top:30px;padding:28px
 
   <section class="tech krs" id="krs">
     <h2>Алникор на каждом этапе: от рождения до конца лактации</h2>
-    <p>Отметьте продукты на тех этапах, где у вас проблема. Калькулятор покажет вложения и выгоду на каждом этапе и по всему комплексу — и где вложение окупается лучше всего.</p>
+    <p>Нажмите на этап на линии, чтобы включить или выключить все его продукты, или отметьте отдельные продукты в карточках ниже. Калькулятор покажет вложения и выгоду на каждом этапе и по всему комплексу — и где вложение окупается лучше всего.</p>
     <div class="krs-ctrl">
       <label class="hlabel" for="krs-heads">Коров в стаде: <b id="krs-hval"></b></label>
       <input class="hrange" id="krs-heads" type="range" min="10" max="3000" step="10" value="200">
@@ -631,11 +641,14 @@ function renderKRS(){
     {l:'Лучше всего окупается этап',v:best?best.st.name+' · ×'+num(best.g/best.c,1):'выберите продукты',k:'hi'},
     {l:'Больше всего денег приносит',v:most?most.st.name+' · '+money(most.g-most.c):'выберите продукты',k:'hi'}
   ].map(t=>`<div class="res ${t.k||''}"><span>${esc(t.l)}</span><b>${esc(t.v)}</b></div>`).join('');
-  $('#krs-line').innerHTML=`<div class="krs-track">${per.map(p=>{const st=p.st;const items=KRS.items.filter(i=>i.stage===st.id);
+  const strip=`<div class="krs-strip" role="group" aria-label="Этапы: нажмите, чтобы включить или выключить все продукты этапа">${per.map((p,k)=>{const its=KRS.items.filter(i=>i.stage===p.st.id),sel=its.filter(i=>krsOn.has(i.id)).length;
+    return `<button type="button" class="knode ${sel?'on':''} ${best&&best.st.id===p.st.id?'best':''}" data-st="${p.st.id}"><span class="kn">${k+1}</span><b>${esc(p.st.name)}</b><small>${sel?'выбрано '+sel+' из '+its.length:'не выбрано'}</small><em>${sel?'+'+money(p.g-p.c):'$0'}</em></button>`}).join('')}</div>`;
+  $('#krs-line').innerHTML=strip+`<div class="krs-track">${per.map(p=>{const st=p.st;const items=KRS.items.filter(i=>i.stage===st.id);
     return `<div class="kst ${best&&best.st.id===st.id?'best':''}"><div class="kdot" aria-hidden="true">${KRS.stages.indexOf(st)+1}</div><b class="kname">${esc(st.name)}</b><span class="kwhen">${esc(st.when)}</span>
     <div class="kitems">${items.map(i=>`<button type="button" class="kchip" aria-pressed="${krsOn.has(i.id)}" data-i="${i.id}"><b>${esc(i.name)}</b><small>${esc(i.benefit)}</small><em>$${num(i.gain-i.cost,1)} на голову</em></button>`).join('')}</div>
     <div class="ksum"><span>вложено ${money(p.c)}</span><span class="kg">выгода ${money(p.g)}</span><b>${p.c?'чистыми '+money(p.g-p.c):'не выбрано'}</b></div></div>`}).join('')}</div>`;
   $('#krs-line').querySelectorAll('.kchip').forEach(b=>b.onclick=()=>{const id=b.dataset.i;krsOn.has(id)?krsOn.delete(id):krsOn.add(id);renderKRS()});
+  $('#krs-line').querySelectorAll('.knode').forEach(b=>b.onclick=()=>{const its=KRS.items.filter(i=>i.stage===b.dataset.st),all=its.every(i=>krsOn.has(i.id));its.forEach(i=>all?krsOn.delete(i.id):krsOn.add(i.id));renderKRS()});
   // chart: columns per stage
   if(tc===0){$('#krs-chart').innerHTML='<p class="empty">Выберите продукты на линии этапов — здесь появится график вложений и выгоды.</p>';}
   else{
