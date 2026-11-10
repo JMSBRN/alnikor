@@ -119,7 +119,7 @@ button{font:inherit;color:inherit}
 svg text{font-family:var(--body)}
 .src{font-size:12px;color:var(--ink-soft)}
 
-/* Разговор с клиентом */
+/* Ваша выгода */
 .talk-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-bottom:16px}
 .tbox{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:10px}
 .tbox h3{font-size:16px}
@@ -211,8 +211,8 @@ footer{background:var(--navy);color:var(--navy-ink);margin-top:30px;padding:28px
   <section id="panel" class="panel" aria-live="polite"></section>
 
   <section class="tech" id="sales">
-    <h2>Разговор с клиентом: выгода и окупаемость</h2>
-    <p>Выберите направление: боли клиента, что предлагаем, польза в цифрах каталога, ответ на «дорого» и калькулятор на цифрах хозяйства.</p>
+    <h2>Ваша выгода: что даёт продукт и когда он окупается</h2>
+    <p>Выберите направление: ваши задачи, наше решение, польза в цифрах каталога и калькулятор окупаемости на цифрах вашего хозяйства.</p>
     <div class="tabs" role="tablist" id="talk-tabs" style="padding-top:0"></div>
     <div id="talk"></div>
   </section>
@@ -297,7 +297,7 @@ footer{background:var(--navy);color:var(--navy-ink);margin-top:30px;padding:28px
           <div class="brow"><span>Хелат</span><div class="btrack"><div class="bfill hi" style="width:90%"></div></div><b>~90 %</b></div>
         </div>
         <p>Ион металла связан с глицином, простейшей аминокислотой. 100 % органическая форма, более 96 % хелатного комплекса, 22–24 % металла. Чуть дороже, но работает в 3–4 раза лучше.</p>
-        <span class="src">Усвояемость по формам — со слов лектора компании; характеристики — каталог СВС</span>
+        <span class="src">Усвояемость по формам — данные Алникор; характеристики — каталог СВС</span>
       </div>
       <div class="tcard">
         <h3>Рубцовая защита: доставка мимо рубца</h3>
@@ -357,7 +357,7 @@ footer{background:var(--navy);color:var(--navy-ink);margin-top:30px;padding:28px
   </div>
 </footer>
 
-<script src="data.js?v=3"></script>
+<script src="data.js?v=4"></script>
 <script>
 const TAGS={chel:['t-chel','хелаты'],rumen:['t-rumen','рубцовая защита'],prol:['t-prol','пролонг']};
 
@@ -440,16 +440,16 @@ function renderTalk(){
   $('#talk-tabs').querySelectorAll('.tab').forEach(b=>b.onclick=()=>{talkId=b.dataset.t;renderTalk()});
   const t=TALK.find(x=>x.id===talkId);
   let h=`<div class="talk-grid">
-    <div class="tbox pain"><h3>Что болит у клиента</h3><ul>${t.pain.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
-    <div class="tbox offer"><h3>Что предлагаем</h3><p style="margin:0;font-size:15px">${esc(t.offer)}</p></div>
-    <div class="tbox value"><h3>Практическая польза</h3><ul>${t.value.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
-  </div><div class="price-line"><b>Если говорят «дорого»:</b> ${esc(t.price)}</div>`;
+    <div class="tbox pain"><h3>Ваши задачи</h3><ul>${t.pain.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
+    <div class="tbox offer"><h3>Наше решение</h3><p style="margin:0;font-size:15px">${esc(t.offer)}</p></div>
+    <div class="tbox value"><h3>Что вы получаете</h3><ul>${t.value.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
+  </div><div class="price-line"><b>Почему это окупается:</b> ${esc(t.price)}</div>`;
   t.calcs.forEach(id=>{const c=CALCS[id];
     h+=`<div class="calc" data-c="${id}"><h3>🧮 ${esc(c.title)}</h3><p class="hint">${esc(c.hint)}</p>
     <div class="fields">${c.f.map(f=>`<label class="field" for="c-${id}-${f[0]}">${esc(f[1])}${f[5]?` <small>${esc(f[5])}</small>`:''}<span class="in"><input id="c-${id}-${f[0]}" type="number" inputmode="decimal" step="${f[3]}" value="${f[2]}" data-k="${f[0]}"><span class="u">${esc(f[4])}</span></span></label>`).join('')}</div>
     <div class="results" id="r-${id}"></div>
     <button class="reset" type="button">Вернуть значения по умолчанию</button>
-    <span class="calc-note">Цены по умолчанию — примеры. Подставьте прайс Алникора и цены хозяйства; эффект продукта зависит от рациона и условий.</span></div>`;});
+    <span class="calc-note">Значения по умолчанию — для примера. Введите цифры вашего хозяйства; актуальную цену продукта уточните у менеджера Алникор. Результат зависит от рациона и условий содержания.</span></div>`;});
   $('#talk').innerHTML=h;
   $('#talk').querySelectorAll('.calc').forEach(box=>{
     const c=CALCS[box.dataset.c];
