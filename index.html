@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Шпаргалка Алникор</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800&family=Manrope:wght@400;500;600;700;800&display=swap">
+<style>
+:root{
+  /* Слой 1: шапка с цифрами. Слой 2: вкладки-животные. Слой 3: этапы/группы и карточки продуктов. Внизу: технологии и формы ввода. */
+  --ink:#12203A; --ink-soft:#4B5873; --paper:#F2F4F7; --card:#FFFFFF; --line:#DCE1E8;
+  --accent:#E2621B; --accent-ink:#B34A10; --accent-soft:#FDEBDD;
+  --good:#2C8456; --good-soft:#E3F3EA; --navy:#12203A; --navy-ink:#F2F4F7; --navy-soft:#AEB9CE;
+  --display:'Unbounded', 'Arial Black', Arial, sans-serif;
+  --body:'Manrope', 'Segoe UI', Arial, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ink:#E9EDF3; --ink-soft:#A9B4C6; --paper:#0E1626; --card:#16213A; --line:#27344F;
+    --accent:#F07A35; --accent-ink:#F59A62; --accent-soft:#3A2416;
+    --good:#5CC48A; --good-soft:#163527; --navy:#1B2A49; --navy-ink:#F2F4F7; --navy-soft:#AEB9CE;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --ink:#E9EDF3; --ink-soft:#A9B4C6; --paper:#0E1626; --card:#16213A; --line:#27344F;
+  --accent:#F07A35; --accent-ink:#F59A62; --accent-soft:#3A2416;
+  --good:#5CC48A; --good-soft:#163527; --navy:#1B2A49; --navy-ink:#F2F4F7; --navy-soft:#AEB9CE;
+  color-scheme: dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5}
+.wrap{max-width:1240px;margin:0 auto;padding:0 20px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.15}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:8px}
+
+/* Шапка */
+.hero{background:var(--navy);color:var(--navy-ink);padding:36px 0 30px}
+.hero-row{display:flex;flex-wrap:wrap;gap:28px;align-items:flex-end;justify-content:space-between}
+.eyebrow{font-size:13px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:#F59A62}
+.hero h1{font-size:clamp(34px,5vw,56px);font-weight:800;margin-top:8px}
+.hero p.lead{color:var(--navy-soft);max-width:60ch;margin:10px 0 0;font-size:17px}
+.stats{display:flex;flex-wrap:wrap;gap:10px}
+.stat{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:12px 16px;min-width:120px}
+.stat b{display:block;font-family:var(--display);font-size:24px;color:#F59A62}
+.stat span{font-size:13px;color:var(--navy-soft)}
+
+/* Вкладки */
+.tabs-bar{position:sticky;top:0;z-index:5;background:var(--paper);border-bottom:1px solid var(--line)}
+.tabs{display:flex;gap:8px;overflow-x:auto;padding:14px 0;scrollbar-width:thin}
+.tab{flex:0 0 auto;display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:8px 16px 8px 8px;cursor:pointer;font-weight:700;font-size:15px;transition:border-color .15s, background .15s}
+.tab .emo{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-size:22px;background:var(--paper)}
+.tab:hover{border-color:var(--accent)}
+.tab[aria-selected="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.tab[aria-selected="true"] .emo{background:var(--accent)}
+.search{display:flex;align-items:center;gap:8px;padding:0 0 14px}
+.search input{flex:1;min-width:0;font:inherit;padding:10px 14px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+
+/* Голова раздела */
+.panel{padding:28px 0 8px}
+.panel-head{display:flex;gap:20px;align-items:center;margin-bottom:22px}
+.big-emo{font-size:64px;line-height:1;width:96px;height:96px;border-radius:24px;display:grid;place-items:center;background:var(--card);border:1px solid var(--line);flex:0 0 auto}
+.panel-head h2{font-size:clamp(22px,3vw,32px)}
+.panel-head p{margin:6px 0 0;color:var(--ink-soft);max-width:70ch}
+
+/* Этапы */
+.stages{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:22px}
+.stage{text-align:left;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;cursor:pointer;display:flex;flex-direction:column;gap:4px;border-top:6px solid var(--line)}
+.stage .s-emo{font-size:28px}
+.stage .s-when{font-size:12px;font-weight:700;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.06em}
+.stage .s-name{font-weight:800;font-size:16px}
+.stage:hover{border-color:var(--accent)}
+.stage[aria-pressed="true"]{border-top-color:var(--accent);box-shadow:0 6px 18px rgba(18,32,58,.12)}
+.stage-note{background:var(--accent-soft);color:var(--ink);border-radius:14px;padding:12px 16px;margin:-8px 0 18px;font-weight:600}
+
+/* Группы и карточки */
+.group{margin:0 0 26px}
+.group h3{font-size:18px;margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.group h3 small{font-family:var(--body);font-weight:600;font-size:14px;color:var(--ink-soft)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px;display:flex;flex-direction:column;gap:8px}
+.card .top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.card .name{font-weight:800;font-size:17px}
+.card .dose{flex:0 0 auto;font-size:12px;font-weight:800;color:var(--accent-ink);background:var(--accent-soft);border-radius:8px;padding:3px 8px;font-variant-numeric:tabular-nums;max-width:48%;text-align:right}
+.card .what{color:var(--ink-soft);font-size:14px;margin:0}
+.card .benefit{margin:0;font-size:15px;font-weight:600;padding-left:12px;border-left:3px solid var(--good)}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-size:12px;font-weight:700;border-radius:999px;padding:2px 9px;background:var(--paper);color:var(--ink-soft);border:1px solid var(--line)}
+.tag.t-chel{background:var(--accent-soft);color:var(--accent-ink);border-color:transparent}
+.tag.t-rumen{background:var(--good-soft);color:var(--good);border-color:transparent}
+.tag.t-prol{background:var(--navy);color:var(--navy-ink);border-color:transparent}
+
+/* Лестница классов */
+.ladder{display:flex;flex-direction:column;gap:8px;margin-bottom:24px}
+.rung{display:grid;grid-template-columns:170px 1fr 1fr;gap:14px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 16px}
+.rung b{font-family:var(--display);font-size:15px}
+.rung .bar{height:10px;border-radius:5px;background:var(--accent)}
+.rung span{font-size:14px;color:var(--ink-soft)}
+@media (max-width:700px){.rung{grid-template-columns:1fr}}
+
+/* Технологии */
+.tech{padding:34px 0;border-top:1px solid var(--line);margin-top:20px}
+.tech > h2{font-size:clamp(22px,3vw,30px);margin-bottom:6px}
+.tech > p{color:var(--ink-soft);margin:0 0 20px;max-width:70ch}
+.tech-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px}
+.tcard{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px;display:flex;flex-direction:column;gap:12px}
+.tcard h3{font-size:17px}
+.tcard p{margin:0;color:var(--ink-soft);font-size:14px}
+.bars{display:flex;flex-direction:column;gap:10px}
+.brow{display:grid;grid-template-columns:90px 1fr 64px;gap:10px;align-items:center;font-size:14px}
+.btrack{height:16px;background:var(--paper);border-radius:8px;overflow:hidden}
+.bfill{height:100%;border-radius:8px;background:var(--ink-soft)}
+.bfill.hi{background:var(--accent)}
+.brow b{font-variant-numeric:tabular-nums;text-align:right}
+.brow.bench{grid-template-columns:minmax(150px,280px) 1fr 96px}
+svg text{font-family:var(--body)}
+.src{font-size:12px;color:var(--ink-soft)}
+
+/* Отёл */
+.ctl{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.cstep{background:var(--card);border:1px solid var(--line);border-top:6px solid var(--ink-soft);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:6px}
+.cstep.hot{border-top-color:var(--accent);background:var(--accent-soft)}
+.cstep h3{font-size:18px}
+.cstep p{margin:0;font-size:14px;color:var(--ink-soft)}
+.cstep .cprod{font-weight:800;color:var(--accent-ink);font-size:15px}
+.cwhen{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft)}
+.chart-wrap{overflow-x:auto}
+.chart-wrap svg{width:100%;min-width:520px;height:auto;display:block}
+.lac-sum{display:flex;flex-wrap:wrap;gap:10px}
+.lac-sum div{flex:1;min-width:200px;border-radius:12px;padding:10px 14px;background:var(--paper)}
+.lac-sum b{font-family:var(--display);font-size:20px;font-variant-numeric:tabular-nums}
+.link-chip{display:inline-block;margin-top:10px;font-weight:700;color:var(--accent-ink);text-decoration:none;border-bottom:2px solid var(--accent)}
+
+/* Формы ввода */
+.scale{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.step{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:6px}
+.step .pct{font-family:var(--display);font-size:26px;color:var(--accent-ink);font-variant-numeric:tabular-nums}
+.step .nm{font-weight:800}
+.step .ex{font-size:13px;color:var(--ink-soft)}
+
+/* Подвал */
+footer{background:var(--navy);color:var(--navy-ink);margin-top:30px;padding:28px 0}
+.foot{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px}
+.foot h3{font-size:16px;margin-bottom:6px}
+.foot p{margin:0;color:var(--navy-soft);font-size:14px}
+.empty{color:var(--ink-soft);padding:20px 0}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap hero-row">
+    <div>
+      <div class="eyebrow">Научно-исследовательское предприятие · Гродно</div>
+      <h1>Алникор</h1>
+      <p class="lead">Корма, добавки и сырьевые компоненты. Выберите животное — увидите, какие продукты ему нужны на каждом этапе и что они дают.</p>
+    </div>
+    <div class="stats">
+      <div class="stat"><b>30 лет</b><span>на рынке</span></div>
+      <div class="stat"><b>12</b><span>учёных-основателей</span></div>
+      <div class="stat"><b>GMP+</b><span>сертификат</span></div>
+      <div class="stat"><b>РБ + ЕАЭС</b><span>доставка</span></div>
+    </div>
+  </div>
+</header>
+
+<div class="tabs-bar">
+  <div class="wrap">
+    <div class="tabs" role="tablist" id="tabs"></div>
+    <div class="search"><label for="q" class="src">Поиск</label><input id="q" type="search" placeholder="Найти продукт или задачу: печень, кетоз, диарея, хелат…"></div>
+  </div>
+</div>
+
+<main class="wrap">
+  <section id="panel" class="panel" aria-live="polite"></section>
+
+  <section class="tech" id="calving">
+    <h2>Отёл: три недели до и три недели после</h2>
+    <p>Самый уязвимый момент. Иммунитет слабый, энергии не хватает. В первые 2 часа корова должна встать, пить и начать есть — тогда запускается лактация. Это направление, которым Алникор особенно отличается.</p>
+
+    <div class="ctl" role="list">
+      <div class="cstep" role="listitem">
+        <span class="cwhen">60–21 день до отёла</span>
+        <h3>Сухостой I</h3>
+        <p class="cprod">Ални-Вит СК-200</p>
+        <p>Корова не набирает лишний жир, печень не ожиревает, крепче иммунитет, лучше молозиво.</p>
+      </div>
+      <div class="cstep" role="listitem">
+        <span class="cwhen">21–0 дней до отёла</span>
+        <h3>Сухостой II</h3>
+        <p class="cprod">СК-500 · Ални-Старт · Ални-Гепо</p>
+        <p>Анионные соли держат кальций после отёла — меньше пареза. Энергия впрок и защита печени.</p>
+      </div>
+      <div class="cstep hot" role="listitem">
+        <span class="cwhen">первые 1–2 часа</span>
+        <h3>Отёл</h3>
+        <p class="cprod">Ални Плюс</p>
+        <p>0,5 кг на 20 л тёплой воды, выпоить в первый час. Энергия и кальций — корова встаёт и начинает есть.</p>
+      </div>
+      <div class="cstep" role="listitem">
+        <span class="cwhen">1–30 дней после</span>
+        <h3>Транзит</h3>
+        <p class="cprod">Энергопак · Ални-Старт · Румихол · Стабидекс</p>
+        <p>Закрывают энергодефицит, не дают уйти в кетоз, корова быстро выходит на раздой.</p>
+      </div>
+    </div>
+
+    <div class="tech-grid" style="margin-top:14px">
+      <div class="tcard">
+        <h3>Через воду и дозатор</h3>
+        <p>Дозатор на поилке работает от потока воды, как поплавок в бачке: добавка подмешивается пропорционально выпитому. Корова пьёт сколько ей нужно — и получает ровно свою дозу, без передозировки. Так подают Энергопак.</p>
+      </div>
+      <div class="tcard">
+        <h3>Вкусно — значит съест</h3>
+        <p>У коровы вкусовых рецепторов больше, чем у человека: невкусное она просто не тронет. Поэтому в энергетиках растительные ароматы, а по каталогу продукты «хорошо потребляются животными».</p>
+      </div>
+      <div class="tcard">
+        <h3>Соли против родильного пареза</h3>
+        <p>В СК-500 — анионные соли: хлорид аммония, хлористый кальций, сернокислый магний. За 3 недели до отёла они готовят организм отдавать кальций, и после отёла его уровень не падает. От кетоза защищают энергетики и Ални-Гепо.</p>
+      </div>
+    </div>
+
+    <div class="tcard" style="margin-top:14px">
+      <h3>Высокий пик — длинная лактация</h3>
+      <p>Чем быстрее и выше корова разгоняется после отёла, тем дольше она держит удой. Пик около 65 л даёт примерно 15 000 кг за лактацию — это потолок лучших ферм мира. Корова, вышедшая на 40 л, раньше опускается до порога, когда её пора запускать.</p>
+      <div class="chart-wrap"><svg id="lac" viewBox="0 0 760 340" role="img" aria-label="График лактации: корова с пиком 65 литров держит удой выше порога дольше, чем корова с пиком 40 литров"></svg></div>
+      <div class="lac-sum" id="lac-sum"></div>
+      <span class="src">Схема для объяснения, не замер: кривые построены по типовой модели лактации (Вуда). Порог запуска — условный, 20 л в сутки.</span>
+    </div>
+    <div class="tcard" style="margin-top:14px">
+      <h3>Где сейчас 15 000 кг: ориентиры</h3>
+      <div class="bars" aria-label="Надой на корову в год: Беларусь в среднем 6566 кг, США 11063 кг, Израиль 12600 литров, лучший колхоз Беларуси около 13700 кг, лучшая ферма Израиля 14858 кг, цель программы 15000 кг">
+        <div class="brow bench"><span>Беларусь, в среднем (2025)</span><div class="btrack"><div class="bfill" style="width:43.8%"></div></div><b>6 566 кг</b></div>
+        <div class="brow bench"><span>США, в среднем (2025)</span><div class="btrack"><div class="bfill" style="width:73.8%"></div></div><b>11 060 кг</b></div>
+        <div class="brow bench"><span>Израиль, в среднем (2025) — мировой лидер</span><div class="btrack"><div class="bfill" style="width:84%"></div></div><b>12 600 л</b></div>
+        <div class="brow bench"><span>СПК «Свислочь», Гродненский р-н (прогноз 2025)</span><div class="btrack"><div class="bfill" style="width:91.3%"></div></div><b>~13 700 кг</b></div>
+        <div class="brow bench"><span>Лучшая ферма Израиля (кибуц Цеэлим)</span><div class="btrack"><div class="bfill" style="width:99%"></div></div><b>14 858 кг</b></div>
+        <div class="brow bench"><span>Цель «Программы 15000+»</span><div class="btrack"><div class="bfill hi" style="width:100%"></div></div><b>15 000+ кг</b></div>
+      </div>
+      <p>15 000 кг на корову в год — не средний показатель ни одной страны, а уровень отдельных лучших ферм. Израиль в среднем даёт около 12 600 л, США — около 11 000 кг. К этому потолку Алникор и стремится вместе с хозяйствами.</p>
+      <span class="src">Источники: Минсельхоз Израиля (2025, через JNS); USDA NASS, 24 390 фунтов на корову за 2025 г.; БГАТУ по данным Минсельхозпрода РБ; The DairyNews (СПК «Свислочь»); журнал M2 (ферма Цеэлим).</span>
+    </div>
+  </section>
+
+  <section class="tech" id="tech">
+    <h2>Три технологии, которые отличают Алникор</h2>
+    <p>Они стоят за большинством продуктов и работают в кормах для коров, птицы и даже собак и кошек.</p>
+    <div class="tech-grid">
+      <div class="tcard">
+        <h3>Хелаты «Хелакор»: металл, который усваивается</h3>
+        <div class="bars" aria-label="Усвояемость микроэлемента: оксид около 20 процентов, сульфат 30–35, хелат около 90">
+          <div class="brow"><span>Оксид</span><div class="btrack"><div class="bfill" style="width:20%"></div></div><b>~20 %</b></div>
+          <div class="brow"><span>Сульфат</span><div class="btrack"><div class="bfill" style="width:33%"></div></div><b>30–35 %</b></div>
+          <div class="brow"><span>Хелат</span><div class="btrack"><div class="bfill hi" style="width:90%"></div></div><b>~90 %</b></div>
+        </div>
+        <p>Ион металла связан с глицином, простейшей аминокислотой. 100 % органическая форма, более 96 % хелатного комплекса, 22–24 % металла. Чуть дороже, но работает в 3–4 раза лучше.</p>
+        <span class="src">Усвояемость по формам — со слов лектора компании; характеристики — каталог СВС</span>
+      </div>
+      <div class="tcard">
+        <h3>Рубцовая защита: доставка мимо рубца</h3>
+        <svg viewBox="0 0 360 170" role="img" aria-label="Схема: обычная добавка разрушается в рубце, добавка в оболочке проходит рубец и усваивается в кишечнике">
+          <rect x="4" y="30" width="110" height="64" rx="14" fill="var(--paper)" stroke="var(--line)"/>
+          <text x="59" y="58" text-anchor="middle" font-size="14" font-weight="700" fill="var(--ink)">Рубец</text>
+          <text x="59" y="78" text-anchor="middle" font-size="11" fill="var(--ink-soft)">бактерии</text>
+          <rect x="246" y="30" width="110" height="64" rx="14" fill="var(--good-soft)" stroke="var(--good)"/>
+          <text x="301" y="58" text-anchor="middle" font-size="14" font-weight="700" fill="var(--ink)">Кишечник</text>
+          <text x="301" y="78" text-anchor="middle" font-size="11" fill="var(--ink-soft)">всасывание</text>
+          <line x1="118" y1="62" x2="240" y2="62" stroke="var(--ink-soft)" stroke-width="2" stroke-dasharray="5 5"/>
+          <circle cx="40" cy="130" r="10" fill="var(--ink-soft)"/>
+          <text x="58" y="134" font-size="12" fill="var(--ink)">обычная — разрушается в рубце</text>
+          <circle cx="40" cy="156" r="10" fill="var(--good)" stroke="var(--ink)" stroke-width="3"/>
+          <text x="58" y="160" font-size="12" fill="var(--ink)">в оболочке — доходит до кишечника</text>
+          <circle cx="180" cy="62" r="12" fill="var(--good)" stroke="var(--ink)" stroke-width="3"/>
+          <path d="M228 56 l12 6 l-12 6 z" fill="var(--ink-soft)"/>
+        </svg>
+        <p>Алнимет, L-Протект, Алницин, Румихол, Стабидекс: стабильность в рубце от 70 до 95 %, полная переваримость в кишечнике. Проверено на фистулированных коровах.</p>
+      </div>
+      <div class="tcard">
+        <h3>Пролонгированное действие: без пиков</h3>
+        <svg viewBox="0 0 360 170" role="img" aria-label="График: обычная форма даёт резкий пик концентрации выше порога, пролонгированная держится ровно ниже порога">
+          <line x1="30" y1="140" x2="350" y2="140" stroke="var(--line)" stroke-width="2"/>
+          <line x1="30" y1="12" x2="30" y2="140" stroke="var(--line)" stroke-width="2"/>
+          <line x1="30" y1="52" x2="350" y2="52" stroke="var(--accent-ink)" stroke-width="1.5" stroke-dasharray="6 5"/>
+          <text x="345" y="46" text-anchor="end" font-size="11" fill="var(--accent-ink)">порог перегрузки</text>
+          <path d="M30 139 C 70 139, 85 18, 115 18 C 145 18, 160 134, 215 137 L 350 139" fill="none" stroke="var(--ink-soft)" stroke-width="3"/>
+          <path d="M30 139 C 65 110, 90 84, 130 84 L 300 84 C 325 84, 335 110, 350 126" fill="none" stroke="var(--accent)" stroke-width="5"/>
+          <text x="122" y="14" font-size="11" fill="var(--ink-soft)">обычная форма</text>
+          <text x="170" y="104" font-size="12" font-weight="700" fill="var(--accent-ink)">пролонгированная</text>
+          <text x="345" y="160" text-anchor="end" font-size="11" fill="var(--ink-soft)">время →</text>
+        </svg>
+        <p>Вещество выходит равномерно, за заданное время. Нет перегрузки печени и потерь. Проамид (мочевина для КРС), Купрокор (медь для птицы), Алнитан.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="tech" id="forms">
+    <h2>Сколько вводить: формы продукции</h2>
+    <p>Чем меньше процент ввода, тем концентрированнее продукт. Хозяйство со своим зерном берёт БМВД или концентрат, завод комбикормов — премиксы и сырьё СВС.</p>
+    <div class="scale">
+      <div class="step"><span class="pct">100 %</span><span class="nm">Полнорационный корм</span><span class="ex">Готов к скармливанию: Мюсли, Малыш, корма Pet’s Brunch</span></div>
+      <div class="step"><span class="pct">10–50 %</span><span class="nm">БМВД</span><span class="ex">Белок + витамины + минералы к своему зерну: КМ-1, Ални-про КДК</span></div>
+      <div class="step"><span class="pct">1–5 %</span><span class="nm">Концентрат</span><span class="ex">Витамины и минералы без белка: Ални-Вит 3 %, Гровер 5 %</span></div>
+      <div class="step"><span class="pct">1 %</span><span class="nm">Премикс</span><span class="ex">П-60-1, П-60-3, ПКР-1, ПКР-2</span></div>
+      <div class="step"><span class="pct">граммы</span><span class="nm">Добавки и сырьё СВС</span><span class="ex">На голову в сутки или на тонну корма: Хелакор, Алнимет</span></div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div><h3>ЧНИУП «Алникор»</h3><p>Гродно, ул. Санаторная, 1<br>8 (0152) 68-12-38 · info@alnikor.by<br><a href="https://alnikor.com" style="color:#F59A62">alnikor.com</a></p></div>
+    <div><h3>Pet’s Brunch</h3><p>+375 152 68 68 88<br>info@petsbrunch.com<br><a href="https://petsbrunch.com" style="color:#F59A62">petsbrunch.com</a></p></div>
+    <div><h3>Сопровождение хозяйств</h3><p>Анализ кормов, расчёт рационов, рецепты комбикормов, контроль TMR, качество молозива, pH мочи и кетоны.</p></div>
+  </div>
+</footer>
+
+<script src="data.js"></script>
+<script>
+const TAGS={chel:['t-chel','хелаты'],rumen:['t-rumen','рубцовая защита'],prol:['t-prol','пролонг']};
+
+let state={animal:'cattle',stage:'calf',q:''};
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function card(p){
+  const tags=p.t.map(k=>`<span class="tag ${TAGS[k][0]}">${TAGS[k][1]}</span>`).join('');
+  return `<article class="card"><div class="top"><span class="name">${esc(p.n)}</span><span class="dose">${esc(p.d)}</span></div>
+  <p class="what">${esc(p.w)}</p><p class="benefit">${esc(p.b)}</p>${tags?`<div class="tags">${tags}</div>`:''}</article>`;
+}
+function groups(list){
+  const order=[];const map={};
+  list.forEach(p=>{if(!map[p.g]){map[p.g]=[];order.push(p.g)}map[p.g].push(p)});
+  return order.map(g=>`<div class="group"><h3>${esc(g)} <small>${map[g].length}</small></h3><div class="cards">${map[g].map(card).join('')}</div></div>`).join('');
+}
+function renderTabs(){
+  $('#tabs').innerHTML=ANIMALS.map(a=>`<button class="tab" role="tab" id="tab-${a.id}" aria-selected="${!state.q&&a.id===state.animal}" data-a="${a.id}"><span class="emo" aria-hidden="true">${a.emo}</span>${esc(a.name)}</button>`).join('');
+  document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{state.q='';$('#q').value='';location.hash=b.dataset.a;go(b.dataset.a)});
+}
+function renderPanel(){
+  const el=$('#panel');
+  if(state.q){
+    const q=state.q.toLowerCase();
+    const hits=P.filter(p=>(p.n+' '+p.w+' '+p.b+' '+p.d).toLowerCase().includes(q));
+    el.innerHTML=`<div class="panel-head"><div class="big-emo" aria-hidden="true">🔎</div><div><h2>Поиск: «${esc(state.q)}»</h2><p>Найдено продуктов: ${hits.length}</p></div></div>`+
+      (hits.length?ANIMALS.filter(a=>hits.some(h=>h.a===a.id)).map(a=>`<div class="group"><h3>${a.emo} ${esc(a.name)}</h3><div class="cards">${hits.filter(h=>h.a===a.id).map(card).join('')}</div></div>`).join(''):'<p class="empty">Ничего не нашлось. Попробуйте другое слово: печень, телята, жара, хелат.</p>');
+    return;
+  }
+  const a=ANIMALS.find(x=>x.id===state.animal);
+  const extra=a.id==='cattle'?'<a class="link-chip" href="#" id="to-calving">Отёл: три недели до и после, график лактации ↓</a>':'';
+  let html=`<div class="panel-head"><div class="big-emo" aria-hidden="true">${a.emo}</div><div><h2>${esc(a.title)}</h2><p>${esc(a.sub)}</p>${extra}</div></div>`;
+  if(a.stages){
+    html+=`<div class="stages">${a.stages.map(s=>`<button class="stage" aria-pressed="${s.id===state.stage}" data-s="${s.id}"><span class="s-emo" aria-hidden="true">${s.emo}</span><span class="s-when">${esc(s.when)}</span><span class="s-name">${esc(s.name)}</span></button>`).join('')}</div>`;
+    const st=a.stages.find(s=>s.id===state.stage);
+    html+=`<div class="stage-note">${esc(st.note)}</div><div class="cards">${P.filter(p=>p.a==='cattle'&&p.g===st.id).map(card).join('')}</div>`;
+  }else{
+    if(a.id==='dogs'||a.id==='cats'){
+      html+=`<div class="group"><h3>Классы кормов <small>от премиальных к базовым</small></h3><div class="ladder">${PET_LADDER.map(r=>`<div class="rung"><b>${r[0]}</b><div><div class="bar" style="width:${r[1]}%" aria-hidden="true"></div><span>${esc(r[2])}</span></div><span>${esc(r[3])}</span></div>`).join('')}</div></div>`;
+    }
+    html+=groups(P.filter(p=>p.a===a.id));
+  }
+  el.innerHTML=html;
+  el.querySelectorAll('.stage').forEach(b=>b.onclick=()=>{state.stage=b.dataset.s;renderPanel()});
+  const tc=el.querySelector('#to-calving');
+  if(tc)tc.onclick=e=>{e.preventDefault();document.getElementById('calving').scrollIntoView({behavior:'smooth'})};
+}
+function go(id){
+  if(!ANIMALS.some(a=>a.id===id))id='cattle';
+  state.animal=id;renderTabs();renderPanel();
+}
+function drawLactation(){
+  const svg=$('#lac');const W=760,H=340,L=56,R=20,T=24,B=44,DAYS=420,MAXY=80,TH=20;
+  const x=d=>L+d/DAYS*(W-L-R), y=v=>T+(1-v/MAXY)*(H-T-B);
+  const wood=(b,c,peak)=>{const tp=b/c,a=peak/(Math.pow(tp,b)*Math.exp(-c*tp));return t=>a*Math.pow(t,b)*Math.exp(-c*t)};
+  const A=wood(0.25,0.005,65), Bc=wood(0.5,0.00714,40);
+  const cross=f=>{for(let t=80;t<=DAYS;t++)if(f(t)<TH)return t;return null};
+  const total=f=>{let s=0;for(let t=1;t<=305;t++)s+=f(t);return Math.round(s/100)*100};
+  const path=f=>{let p='';for(let t=1;t<=DAYS;t+=3){p+=(t===1?'M':'L')+x(t).toFixed(1)+' '+y(f(t)).toFixed(1)}return p};
+  const area=f=>path(f)+`L${x(DAYS)} ${y(0)} L${x(1)} ${y(0)} Z`;
+  let g='';
+  for(let v=0;v<=MAXY;v+=20){g+=`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${L-8}" y="${y(v)+4}" text-anchor="end" font-size="12" fill="var(--ink-soft)">${v}</text>`}
+  for(let d=0;d<=DAYS;d+=60){g+=`<text x="${x(d)}" y="${H-B+20}" text-anchor="middle" font-size="12" fill="var(--ink-soft)">${d}</text>`}
+  g+=`<text x="${L}" y="14" font-size="12" fill="var(--ink-soft)">литров в сутки</text><text x="${W-R}" y="${H-6}" text-anchor="end" font-size="12" fill="var(--ink-soft)">дни лактации</text>`;
+  g+=`<line x1="${x(305)}" x2="${x(305)}" y1="${T}" y2="${y(0)}" stroke="var(--ink-soft)" stroke-dasharray="3 5"/><text x="${x(305)+6}" y="${T+12}" font-size="12" fill="var(--ink-soft)">305 дней</text>`;
+  g+=`<path d="${area(A)}" fill="var(--accent)" opacity=".12"/><path d="${area(Bc)}" fill="var(--ink-soft)" opacity=".12"/>`;
+  g+=`<line x1="${L}" x2="${W-R}" y1="${y(TH)}" y2="${y(TH)}" stroke="var(--accent-ink)" stroke-width="1.5" stroke-dasharray="7 5"/><text x="${L+8}" y="${y(TH)-6}" font-size="12" font-weight="700" fill="var(--accent-ink)">порог запуска ~${TH} л</text>`;
+  g+=`<path d="${path(Bc)}" fill="none" stroke="var(--ink-soft)" stroke-width="3.5"/><path d="${path(A)}" fill="none" stroke="var(--accent)" stroke-width="4.5"/>`;
+  const cA=cross(A),cB=cross(Bc);
+  g+=`<circle cx="${x(50)}" cy="${y(65)}" r="6" fill="var(--accent)"/><text x="${x(50)+10}" y="${y(65)-8}" font-size="13" font-weight="800" fill="var(--accent-ink)">пик 65 л · цель «15000+»</text>`;
+  g+=`<circle cx="${x(70)}" cy="${y(40)}" r="6" fill="var(--ink-soft)"/><text x="${x(70)+10}" y="${y(40)-10}" font-size="13" font-weight="700" fill="var(--ink-soft)">пик 40 л · «своим ходом»</text>`;
+  if(cB)g+=`<circle cx="${x(cB)}" cy="${y(TH)}" r="5" fill="var(--ink)"/><text x="${x(cB)}" y="${y(TH)+20}" text-anchor="middle" font-size="12" fill="var(--ink)">запуск ~${cB} д.</text>`;
+  svg.innerHTML=g;
+  $('#lac-sum').innerHTML=`<div><b style="color:var(--accent-ink)">≈ ${total(A).toLocaleString('ru-RU')} кг</b><br>за 305 дней при пике 65 л — уровень лучших ферм мира; выше порога ${cA?'до ~'+cA+' дня':'всю лактацию'}</div><div><b>≈ ${total(Bc).toLocaleString('ru-RU')} кг</b><br>за 305 дней при пике 40 л; опускается до порога к ~${cB} дню</div>`;
+}
+drawLactation();
+
+$('#q').addEventListener('input',e=>{state.q=e.target.value.trim();renderTabs();renderPanel()});
+window.addEventListener('hashchange',()=>go(location.hash.slice(1)));
+go(location.hash.slice(1)||'cattle');
+</script>
+</body>
+</html>
