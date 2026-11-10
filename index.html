@@ -214,6 +214,30 @@ svg text{font-family:var(--body)}
 .how ul{margin:6px 0;padding-left:18px}
 .how p{margin:0}
 
+/* КРС: линия этапов */
+.krs-ctrl{display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
+.krs-btns{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.krs-line{overflow-x:auto;margin:16px 0;padding-bottom:6px}
+.krs-track{display:grid;grid-template-columns:repeat(8,minmax(190px,1fr));gap:10px;position:relative;min-width:1560px}
+.krs-track::before{content:"";position:absolute;left:24px;right:24px;top:22px;height:4px;background:linear-gradient(90deg,var(--accent),var(--good));border-radius:2px}
+.kst{position:relative;display:flex;flex-direction:column;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px;margin-top:0}
+.kst.best{border:2px solid var(--accent);box-shadow:0 6px 18px rgba(226,98,27,.18)}
+.kdot{width:44px;height:44px;border-radius:50%;background:var(--card);border:3px solid var(--accent);display:grid;place-items:center;font-size:22px;position:relative;z-index:1;margin-top:-2px}
+.kname{font-family:var(--display);font-size:15px}
+.kwhen{font-size:12px;color:var(--ink-soft);font-weight:700}
+.kitems{display:flex;flex-direction:column;gap:6px;flex:1}
+.kchip{text-align:left;cursor:pointer;background:var(--paper);border:2px solid var(--line);border-radius:12px;padding:8px 10px;display:flex;flex-direction:column;gap:2px}
+.kchip b{font-size:14px}
+.kchip small{font-size:12px;color:var(--ink-soft);line-height:1.35}
+.kchip em{font-style:normal;font-size:12px;font-weight:800;color:var(--good)}
+.kchip[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.kchip[aria-pressed="false"] em{color:var(--ink-soft)}
+.ksum{display:flex;flex-direction:column;gap:2px;font-size:12px;color:var(--ink-soft);border-top:1px solid var(--line);padding-top:8px}
+.ksum .kg{color:var(--good);font-weight:700}
+.ksum b{font-size:14px;color:var(--ink)}
+.list-title{font-size:clamp(20px,2.4vw,26px);margin:8px 0 14px}
+.price-line{background:var(--navy);color:var(--navy-ink);border-radius:16px;padding:14px 18px;margin:0 0 14px;font-weight:600}
+
 /* Отёл */
 .ctl{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
 .cstep{background:var(--card);border:1px solid var(--line);border-top:6px solid var(--ink-soft);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:6px}
@@ -287,6 +311,29 @@ footer{background:var(--navy);color:var(--navy-ink);margin-top:30px;padding:28px
 </section>
 
 <main class="wrap">
+  <section id="sechead" class="panel" style="padding-bottom:0"></section>
+
+  <section class="tech krs" id="krs">
+    <h2>Алникор на каждом этапе: от рождения до конца лактации</h2>
+    <p>Отметьте продукты на тех этапах, где у вас проблема. Калькулятор покажет вложения и выгоду на каждом этапе и по всему комплексу — и где вложение окупается лучше всего.</p>
+    <div class="krs-ctrl">
+      <label class="hlabel" for="krs-heads">Коров в стаде: <b id="krs-hval"></b></label>
+      <input class="hrange" id="krs-heads" type="range" min="10" max="3000" step="10" value="200">
+      <div class="krs-btns"><button type="button" class="reset" id="krs-all">Выбрать весь комплекс</button><button type="button" class="reset" id="krs-none">Сбросить</button><span class="calc-note" id="krs-calves"></span></div>
+    </div>
+    <div class="results" id="krs-sum"></div>
+    <div class="krs-line" id="krs-line"></div>
+    <div class="cchart" id="krs-chart"></div>
+    <details class="how"><summary>Как считаем</summary><ul id="krs-how"></ul><p>Цены — в долларах США, для примера; эффекты — по каталогу, где он даёт цифру, иначе ориентир. Точный расчёт под ваше хозяйство сделает специалист Алникор.</p></details>
+  </section>
+
+  <section class="tech" id="sales">
+    <h2 id="sales-title">Калькулятор выгоды</h2>
+    <p id="sales-sub">Выберите поголовье и продукты Алникор — выгода посчитается сама.</p>
+    <div class="tabs" role="tablist" id="talk-tabs" style="padding-top:0"></div>
+    <div id="talk"></div>
+  </section>
+
   <section id="panel" class="panel" aria-live="polite"></section>
 
   <section class="tech" id="calving">
@@ -355,13 +402,6 @@ footer{background:var(--navy);color:var(--navy-ink);margin-top:30px;padding:28px
       <p>15 000 кг на корову в год — не средний показатель ни одной страны, а уровень отдельных лучших ферм. Израиль в среднем даёт около 12 600 л, США — около 11 000 кг. К этому потолку Алникор и стремится вместе с хозяйствами.</p>
       <span class="src">Источники: Минсельхоз Израиля (2025, через JNS); USDA NASS, 24 390 фунтов на корову за 2025 г.; БГАТУ по данным Минсельхозпрода РБ; The DairyNews (СПК «Свислочь»); журнал M2 (ферма Цеэлим).</span>
     </div>
-  </section>
-
-  <section class="tech" id="sales">
-    <h2 id="sales-title">Ваша выгода: что даёт продукт и когда он окупается</h2>
-    <p id="sales-sub">Ваши задачи, наше решение, польза в цифрах каталога и калькулятор окупаемости на цифрах вашего хозяйства.</p>
-    <div class="tabs" role="tablist" id="talk-tabs" style="padding-top:0"></div>
-    <div id="talk"></div>
   </section>
 
   <section class="tech" id="tech">
@@ -436,7 +476,7 @@ footer{background:var(--navy);color:var(--navy-ink);margin-top:30px;padding:28px
   </div>
 </footer>
 
-<script src="data.js?v=10"></script>
+<script src="data.js?v=11"></script>
 <script>
 const TAGS={chel:['t-chel','хелаты'],rumen:['t-rumen','рубцовая защита'],prol:['t-prol','пролонг']};
 
@@ -464,6 +504,7 @@ function renderNav(){
 function show(id,on){const el=document.getElementById(id);if(el)el.classList.toggle('hidden',!on)}
 function renderPanel(){
   const el=$('#panel');
+  $('#sechead').innerHTML='';
   if(state.q){
     const q=state.q.toLowerCase();
     const hits=P.filter(p=>(p.n+' '+p.w+' '+p.b+' '+p.d).toLowerCase().includes(q));
@@ -478,9 +519,10 @@ function renderPanel(){
     return;
   }
   const x=SEC(state.route);
-  let html=`<div class="panel-head"><div class="big-emo" aria-hidden="true">${x.emo}</div><div><h2>${esc(x.title)}</h2><p>${esc(x.sub)}</p>${x.id==='cattle'?'<a class="link-chip" href="#" id="to-calving">Отёл: три недели до и после, график лактации ↓</a>':''}</div></div>`;
+  $('#sechead').innerHTML=`<div class="panel-head"><div class="big-emo" aria-hidden="true">${x.emo}</div><div><h2>${esc(x.title)}</h2><p>${esc(x.sub)}</p></div></div>`;
+  let html=`<h2 class="list-title">Продукты</h2>`;
   if(x.soon){
-    html+=`<div class="soon-box"><h3>Раздел в подготовке</h3><p>Ассортимент минеральных удобрений для теплиц скоро появится здесь. Чтобы узнать подробности уже сейчас, свяжитесь с Алникор: 8 (0152) 68-12-38, info@alnikor.by.</p></div>`;
+    html='';html+=`<div class="soon-box"><h3>Раздел в подготовке</h3><p>Ассортимент минеральных удобрений для теплиц скоро появится здесь. Чтобы узнать подробности уже сейчас, свяжитесь с Алникор: 8 (0152) 68-12-38, info@alnikor.by.</p></div>`;
     el.innerHTML=html;return;
   }
   const subId=state.sub[x.id]||x.subs[0].id, su=x.subs.find(s=>s.id===subId)||x.subs[0];
@@ -493,13 +535,13 @@ function renderPanel(){
   html+=su.g?`<div class="cards">${list.map(card).join('')}</div>`:groups(list);
   el.innerHTML=html;
   el.querySelectorAll('.stage').forEach(b=>b.onclick=()=>{state.sub[x.id]=b.dataset.s;renderPanel()});
-  const tc=el.querySelector('#to-calving');
-  if(tc)tc.onclick=e=>{e.preventDefault();document.getElementById('calving').scrollIntoView({behavior:'smooth'})};
 }
 function layout(){
   const home=state.route==='home'&&!state.q, x=SEC(state.route), blocks=(x&&!state.q&&x.blocks)||[];
   show('hero',home);show('mission',home);
   show('calving',blocks.includes('calving'));
+  show('krs',blocks.includes('krs'));
+  if(blocks.includes('krs'))try{renderKRS()}catch(e){console.error(e)}
   show('tech',home||blocks.includes('tech'));
   show('forms',home||blocks.includes('forms'));
   const talk=(x&&!state.q&&x.talk)||[];
@@ -572,6 +614,42 @@ function renderChart(ch){
   return `<div class="bgroups">${ch.groups.map(gr=>{gr.items.forEach(i=>{if(!(i.v>0))i.v=0});const m=Math.max(...gr.items.map(i=>i.v))||1;
     return `<div class="bgroup"><h4>${esc(gr.title)}</h4>${gr.items.map(i=>`<div class="brow2"><span>${esc(i.l)}</span><div class="btrack2"><div class="bfill2 ${i.hi?'hi':''}" style="width:${Math.max(2,i.v/m*100)}%"></div></div><b>${esc(gr.fmt(i.v))}</b></div>`).join('')}</div>`}).join('')}</div>`;
 }
+
+const krsOn=new Set(KRS.items.map(i=>i.id));
+function renderKRS(){
+  const n=+$('#krs-heads').value||0, calves=Math.round(n*KRS.calvesShare);
+  $('#krs-hval').textContent=num(n)+' гол.';
+  $('#krs-calves').textContent='Телят в год ≈ '+num(calves)+' (90 % от коров)';
+  const heads=st=>st.base==='calves'?calves:n;
+  let tc=0,tg=0;const per=KRS.stages.map(st=>{let c=0,g=0;KRS.items.filter(i=>i.stage===st.id&&krsOn.has(i.id)).forEach(i=>{c+=i.cost*heads(st);g+=i.gain*heads(st)});tc+=c;tg+=g;return {st,c,g}});
+  const best=per.filter(p=>p.c>0).sort((a,b)=>(b.g/b.c)-(a.g/a.c))[0], most=per.filter(p=>p.c>0).sort((a,b)=>(b.g-b.c)-(a.g-a.c))[0];
+  $('#krs-sum').innerHTML=[
+    {l:'Вложения в продукты Алникор',v:money(tc)},
+    {l:'Выгода за цикл',v:money(tg),k:'good'},
+    {l:'Ваша чистая выгода',v:money(tg-tc),k:tg>=tc?'hi':'bad'},
+    {l:'Каждый вложенный $1 возвращает',v:tc>0?'$'+num(tg/tc,1):'—',k:'good'},
+    {l:'Лучше всего окупается этап',v:best?best.st.name+' · ×'+num(best.g/best.c,1):'выберите продукты',k:'hi'},
+    {l:'Больше всего денег приносит',v:most?most.st.name+' · '+money(most.g-most.c):'выберите продукты',k:'hi'}
+  ].map(t=>`<div class="res ${t.k||''}"><span>${esc(t.l)}</span><b>${esc(t.v)}</b></div>`).join('');
+  $('#krs-line').innerHTML=`<div class="krs-track">${per.map(p=>{const st=p.st;const items=KRS.items.filter(i=>i.stage===st.id);
+    return `<div class="kst ${best&&best.st.id===st.id?'best':''}"><div class="kdot" aria-hidden="true">${st.emo}</div><b class="kname">${esc(st.name)}</b><span class="kwhen">${esc(st.when)}</span>
+    <div class="kitems">${items.map(i=>`<button type="button" class="kchip" aria-pressed="${krsOn.has(i.id)}" data-i="${i.id}"><b>${esc(i.name)}</b><small>${esc(i.benefit)}</small><em>$${num(i.gain-i.cost,1)} на голову</em></button>`).join('')}</div>
+    <div class="ksum"><span>вложено ${money(p.c)}</span><span class="kg">выгода ${money(p.g)}</span><b>${p.c?'чистыми '+money(p.g-p.c):'не выбрано'}</b></div></div>`}).join('')}</div>`;
+  $('#krs-line').querySelectorAll('.kchip').forEach(b=>b.onclick=()=>{const id=b.dataset.i;krsOn.has(id)?krsOn.delete(id):krsOn.add(id);renderKRS()});
+  // chart: columns per stage
+  const W=760,H=280,L=60,R=16,T=20,B=58,max=Math.max(1,...per.map(p=>Math.max(p.c,p.g)))*1.15,cw=(W-L-R)/per.length;
+  const y=v=>T+(1-v/max)*(H-T-B);let g='';
+  for(let i=0;i<=4;i++){const v=max/4*i;g+=`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${L-6}" y="${y(v)+4}" text-anchor="end" font-size="11" fill="var(--ink-soft)">${money(v)}</text>`}
+  per.forEach((p,k)=>{const x0=L+k*cw+cw*0.15,bw=cw*0.32;
+    g+=`<rect x="${x0}" y="${y(p.c)}" width="${bw}" height="${y(0)-y(p.c)}" rx="3" fill="var(--ink-soft)" opacity=".55"/><rect x="${x0+bw+2}" y="${y(p.g)}" width="${bw}" height="${y(0)-y(p.g)}" rx="3" fill="var(--accent)"/>`;
+    g+=`<text x="${L+k*cw+cw/2}" y="${H-B+18}" text-anchor="middle" font-size="16">${p.st.emo}</text><text x="${L+k*cw+cw/2}" y="${H-B+36}" text-anchor="middle" font-size="11" fill="var(--ink-soft)">${esc(p.st.name)}</text>`});
+  g+=`<rect x="${L}" y="${H-12}" width="12" height="10" fill="var(--ink-soft)" opacity=".55"/><text x="${L+16}" y="${H-3}" font-size="11" fill="var(--ink-soft)">вложения</text><rect x="${L+90}" y="${H-12}" width="12" height="10" fill="var(--accent)"/><text x="${L+106}" y="${H-3}" font-size="11" fill="var(--ink-soft)">выгода</text>`;
+  $('#krs-chart').innerHTML=`<div class="chart-wrap"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Вложения и выгода по этапам">${g}</svg></div>`;
+  $('#krs-how').innerHTML=KRS.items.map(i=>`<li><b>${esc(i.name)}</b> (${esc(KRS.stages.find(s=>s.id===i.stage).name)}): ${esc(i.how)}</li>`).join('')+`<li>Молоко $${K.milkPrice}/кг</li>`;
+}
+$('#krs-heads').addEventListener('input',renderKRS);
+$('#krs-all').onclick=()=>{KRS.items.forEach(i=>krsOn.add(i.id));renderKRS()};
+$('#krs-none').onclick=()=>{krsOn.clear();renderKRS()};
 let talkId='milk';
 function renderTalk(ids){
   const items=TALK.filter(t=>ids.includes(t.id));
@@ -579,11 +657,7 @@ function renderTalk(ids){
   $('#talk-tabs').innerHTML=items.map(t=>`<button class="tab" role="tab" aria-selected="${t.id===talkId}" data-t="${t.id}"><span class="emo" aria-hidden="true">${t.emo}</span>${esc(t.name)}</button>`).join('');
   $('#talk-tabs').querySelectorAll('.tab').forEach(b=>b.onclick=()=>{talkId=b.dataset.t;renderTalk(ids)});
   const t=TALK.find(x=>x.id===talkId);
-  let h=`<div class="talk-grid">
-    <div class="tbox pain"><h3>Ваши задачи</h3><ul>${t.pain.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
-    <div class="tbox offer"><h3>Наше решение</h3><p style="margin:0;font-size:15px">${esc(t.offer)}</p></div>
-    <div class="tbox value"><h3>Что вы получаете</h3><ul>${t.value.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
-  </div><div class="price-line"><b>Почему это окупается:</b> ${esc(t.price)}</div>`;
+  let h=`<p class="price-line">${esc(t.price)}</p>`;
   t.calcs.forEach(id=>{const c=CALCS[id],H=c.heads;
     h+=`<div class="calc" data-c="${id}"><h3>🧮 ${esc(c.title)}</h3>
     <div class="ctrl">
