@@ -151,6 +151,18 @@ svg text{font-family:var(--body)}
 .reset{align-self:flex-start;background:none;border:1px solid var(--line);border-radius:10px;padding:6px 12px;cursor:pointer;font-size:13px;font-weight:700}
 .reset:hover{border-color:var(--accent)}
 
+/* Графики калькуляторов */
+.cchart .chart-wrap svg{min-width:480px}
+.bgroups{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.bgroup{background:var(--paper);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.bgroup h4{margin:0;font-size:14px}
+.brow2{display:grid;grid-template-columns:1fr;gap:4px;font-size:13px}
+.brow2 span{color:var(--ink-soft);font-weight:600}
+.btrack2{height:22px;background:var(--card);border-radius:8px;overflow:hidden}
+.bfill2{height:100%;border-radius:8px;background:var(--ink-soft);transition:width .3s}
+.bfill2.hi{background:var(--accent)}
+.brow2 b{font-family:var(--display);font-size:16px;font-variant-numeric:tabular-nums}
+
 /* Отёл */
 .ctl{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
 .cstep{background:var(--card);border:1px solid var(--line);border-top:6px solid var(--ink-soft);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:6px}
@@ -357,7 +369,7 @@ footer{background:var(--navy);color:var(--navy-ink);margin-top:30px;padding:28px
   </div>
 </footer>
 
-<script src="data.js?v=4"></script>
+<script src="data.js?v=5"></script>
 <script>
 const TAGS={chel:['t-chel','хелаты'],rumen:['t-rumen','рубцовая защита'],prol:['t-prol','пролонг']};
 
@@ -377,7 +389,7 @@ function groups(list){
 }
 function renderTabs(){
   $('#tabs').innerHTML=ANIMALS.map(a=>`<button class="tab" role="tab" id="tab-${a.id}" aria-selected="${!state.q&&a.id===state.animal}" data-a="${a.id}"><span class="emo" aria-hidden="true">${a.emo}</span>${esc(a.name)}</button>`).join('');
-  document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{state.q='';$('#q').value='';location.hash=b.dataset.a;go(b.dataset.a)});
+  document.querySelectorAll('#tabs .tab').forEach(b=>b.onclick=()=>{state.q='';$('#q').value='';location.hash=b.dataset.a;go(b.dataset.a)});
 }
 function renderPanel(){
   const el=$('#panel');
@@ -434,6 +446,27 @@ function drawLactation(){
   svg.innerHTML=g;
   $('#lac-sum').innerHTML=`<div><b style="color:var(--accent-ink)">≈ ${total(A).toLocaleString('ru-RU')} кг</b><br>за 305 дней при пике 65 л — уровень лучших ферм мира; выше порога ${cA?'до ~'+cA+' дня':'всю лактацию'}</div><div><b>≈ ${total(Bc).toLocaleString('ru-RU')} кг</b><br>за 305 дней при пике 40 л; опускается до порога к ~${cB} дню</div>`;
 }
+function renderChart(ch){
+  if(ch.type==='payback'){
+    const W=760,H=300,L=70,R=24,T=28,B=46, total=ch.gainDay*ch.days, maxY=Math.max(total,ch.cost)*1.12||1;
+    const x=d=>L+d/ch.days*(W-L-R), y=v=>T+(1-v/maxY)*(H-T-B), pb=ch.gainDay>0?ch.cost/ch.gainDay:Infinity;
+    let g='';
+    for(let i=0;i<=4;i++){const v=maxY/4*i;g+=`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${L-8}" y="${y(v)+4}" text-anchor="end" font-size="12" fill="var(--ink-soft)">${money(v)}</text>`}
+    for(let i=0;i<=5;i++){const d=Math.round(ch.days/5*i);g+=`<text x="${x(d)}" y="${H-B+20}" text-anchor="middle" font-size="12" fill="var(--ink-soft)">${d}</text>`}
+    g+=`<text x="${W-R}" y="${H-6}" text-anchor="end" font-size="12" fill="var(--ink-soft)">дни</text>`;
+    if(pb<ch.days){g+=`<path d="M${x(pb)} ${y(ch.cost)} L${x(ch.days)} ${y(total)} L${x(ch.days)} ${y(ch.cost)} Z" fill="var(--good)" opacity=".18"/>`;
+      g+=`<text x="${(x(pb)+x(ch.days))/2+20}" y="${(y(ch.cost)+y(total))/2+22}" text-anchor="middle" font-size="13" font-weight="800" fill="var(--good)">чистая выгода ${money(total-ch.cost)}</text>`}
+    g+=`<line x1="${x(0)}" x2="${x(ch.days)}" y1="${y(ch.cost)}" y2="${y(ch.cost)}" stroke="var(--ink-soft)" stroke-width="3" stroke-dasharray="8 6"/>`;
+    g+=`<text x="${x(0)+6}" y="${y(ch.cost)-8}" font-size="12" font-weight="700" fill="var(--ink-soft)">вложено в продукт ${money(ch.cost)}</text>`;
+    g+=`<line x1="${x(0)}" y1="${y(0)}" x2="${x(ch.days)}" y2="${y(total)}" stroke="var(--accent)" stroke-width="4"/>`;
+    g+=`<text x="${x(ch.days)-6}" y="${y(total)-10}" text-anchor="end" font-size="13" font-weight="800" fill="var(--accent-ink)">${esc(ch.gainLabel)}: ${money(total)}</text>`;
+    if(pb<=ch.days){g+=`<line x1="${x(pb)}" x2="${x(pb)}" y1="${y(ch.cost)}" y2="${y(0)}" stroke="var(--good)" stroke-width="2"/><circle cx="${x(pb)}" cy="${y(ch.cost)}" r="7" fill="var(--good)"/>`;
+      g+=`<text x="${x(pb)}" y="${y(0)-8}" text-anchor="middle" font-size="12" font-weight="800" fill="var(--good)" paint-order="stroke" stroke="var(--card)" stroke-width="4">окупилось: ${Math.ceil(pb)}-й день</text>`}
+    return `<div class="chart-wrap"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Окупаемость: вложено ${money(ch.cost)}, выгода за период ${money(total)}">${g}</svg></div>`;
+  }
+  return `<div class="bgroups">${ch.groups.map(gr=>{const m=Math.max(...gr.items.map(i=>i.v))||1;
+    return `<div class="bgroup"><h4>${esc(gr.title)}</h4>${gr.items.map(i=>`<div class="brow2"><span>${esc(i.l)}</span><div class="btrack2"><div class="bfill2 ${i.hi?'hi':''}" style="width:${Math.max(2,i.v/m*100)}%"></div></div><b>${esc(gr.fmt(i.v))}</b></div>`).join('')}</div>`}).join('')}</div>`;
+}
 let talkId='milk';
 function renderTalk(){
   $('#talk-tabs').innerHTML=TALK.map(t=>`<button class="tab" role="tab" aria-selected="${t.id===talkId}" data-t="${t.id}"><span class="emo" aria-hidden="true">${t.emo}</span>${esc(t.name)}</button>`).join('');
@@ -447,6 +480,7 @@ function renderTalk(){
   t.calcs.forEach(id=>{const c=CALCS[id];
     h+=`<div class="calc" data-c="${id}"><h3>🧮 ${esc(c.title)}</h3><p class="hint">${esc(c.hint)}</p>
     <div class="fields">${c.f.map(f=>`<label class="field" for="c-${id}-${f[0]}">${esc(f[1])}${f[5]?` <small>${esc(f[5])}</small>`:''}<span class="in"><input id="c-${id}-${f[0]}" type="number" inputmode="decimal" step="${f[3]}" value="${f[2]}" data-k="${f[0]}"><span class="u">${esc(f[4])}</span></span></label>`).join('')}</div>
+    <div class="cchart"></div>
     <div class="results" id="r-${id}"></div>
     <button class="reset" type="button">Вернуть значения по умолчанию</button>
     <span class="calc-note">Значения по умолчанию — для примера. Введите цифры вашего хозяйства; актуальную цену продукта уточните у менеджера Алникор. Результат зависит от рациона и условий содержания.</span></div>`;});
@@ -454,7 +488,9 @@ function renderTalk(){
   $('#talk').querySelectorAll('.calc').forEach(box=>{
     const c=CALCS[box.dataset.c];
     const calc=()=>{const v={};box.querySelectorAll('input').forEach(i=>v[i.dataset.k]=parseFloat(String(i.value).replace(',','.'))||0);
-      box.querySelector('.results').innerHTML=c.run(v).map(r=>`<div class="res ${r.k||''}"><span>${esc(r.l)}</span><b>${esc(r.v)}</b></div>`).join('')};
+      const r=c.run(v);
+      box.querySelector('.results').innerHTML=r.tiles.map(t=>`<div class="res ${t.k||''}"><span>${esc(t.l)}</span><b>${esc(t.v)}</b></div>`).join('');
+      box.querySelector('.cchart').innerHTML=r.chart?renderChart(r.chart):''};
     box.querySelectorAll('input').forEach(i=>i.addEventListener('input',calc));
     box.querySelector('.reset').onclick=()=>{c.f.forEach(f=>box.querySelector(`[data-k="${f[0]}"]`).value=f[2]);calc()};
     calc();
