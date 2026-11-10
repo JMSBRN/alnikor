@@ -242,7 +242,7 @@ window.CALCS={
   run:(n,on)=>{const b=K.broiler, w=b.weight*(1+(on.conc?b.wplus:0)/100), c0=b.weight*b.yield/100, c1=w*b.yield/100;
    const fcr=b.fcr-(on.aln?b.alnFcr:0), feedT=n*w*fcr/1000, meat=n*(c1-c0)+(on.conc?n*b.surv/100*c1:0);
    const gain=meat*b.carc+(on.aln?n*w*b.alnFcr*b.feedPrice:0), cost=feedT*((on.conc?b.concCost:0)+(on.aln?b.alnCost:0));
-   return {tiles:[{l:'Дополнительно мяса (тушка)',v:num(meat)+' кг',k:'good'},{l:'Тушка на одну птицу',v:num(c0,2)+' → '+num(c1,2)+' кг',k:'good'},...ret(gain,cost)],
+   return {tiles:[{l:'Дополнительно мяса (тушка)',v:num(meat)+' кг',k:'good'},{l:'Тушка каждой птицы тяжелее на',v:num((c1-c0)*1000)+' г',k:'good'},...ret(gain,cost)],
     chart:{type:'bars',groups:[{title:'Тушка на одну птицу',fmt:x=>num(x,2)+' кг',items:[{l:'Без продуктов',v:c0},{l:'С продуктами Алникор',v:c1,hi:true}]},
       {title:'За один цикл',fmt:money,items:[{l:'Вложения',v:cost},{l:'Доход',v:gain,hi:true}]}]},
     how:['Убойный вес 2,5 кг, выход тушки 72 %, тушка $'+b.carc+'/кг','Концентраты: +3 % живого веса и +1 п. п. сохранности (ориентир), доплата $8 на тонну корма','Алнитан: конверсия лучше на 0,03 (ориентир), 0,4 кг на тонну']}}},
@@ -261,7 +261,8 @@ window.CALCS={
   products:[{id:'chel',name:'Хелакор цинка',desc:'вместо сульфата цинка',on:true}],
   run:(n,on)=>{const c=K.chel, metS=c.sulfNorm*c.sulfMetal/100, abs=metS*c.sulfAbs/100, metC=abs/(c.chelAbs/100), prodC=metC/(c.chelMetal/100);
    const kgS=n*c.sulfNorm/1000, kgC=n*prodC/1000, lossS=n*(metS-abs)/1000, lossC=n*(metC-abs)/1000;
-   return {tiles:[{l:'Нужно продукта в месяц',v:on.chel?num(kgC)+' кг вместо '+num(kgS)+' кг':num(kgS)+' кг сульфата',k:'good'},{l:'Металла уходит в навоз',v:on.chel?num(lossC,1)+' кг вместо '+num(lossS,1)+' кг':num(lossS,1)+' кг',k:'good'},{l:'Животное получает столько же цинка',v:num(n*abs/1000,1)+' кг в месяц',k:'hi'}],
+   const kgCx=on.chel?kgC:0, saveKg=on.chel?kgS-kgC:0, saveLoss=on.chel?lossS-lossC:0;
+   return {tiles:[{l:'Ввод продукта меньше на',v:num(saveKg)+' кг в месяц',k:'good'},{l:'Цинка в навоз меньше на',v:num(saveLoss,1)+' кг в месяц',k:'good'},{l:'Хелакора нужно',v:num(kgCx)+' кг в месяц',k:'hi'}],
     chart:{type:'bars',groups:[{title:'Ввод продукта в месяц',fmt:x=>num(x)+' кг',items:[{l:'Сульфат цинка',v:kgS},{l:'Хелакор цинка',v:on.chel?kgC:kgS,hi:true}]},
       {title:'Цинк в навоз в месяц',fmt:x=>num(x,1)+' кг',items:[{l:'Сульфат цинка',v:lossS},{l:'Хелакор цинка',v:on.chel?lossC:lossS,hi:true}]}]},
     how:['Норма сульфата цинка 200 г/т (35 % цинка), усвояемость 30 %','Хелакор цинка: 24 % цинка, усвояемость ~90 % (данные Алникор)','Расчёт на то же количество усвоенного цинка']}}},
