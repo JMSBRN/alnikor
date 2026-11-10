@@ -420,7 +420,7 @@ footer{background:var(--navy);color:var(--navy-ink);margin-top:30px;padding:28px
   </div>
 </footer>
 
-<script src="data.js?v=8"></script>
+<script src="data.js?v=9"></script>
 <script>
 const TAGS={chel:['t-chel','хелаты'],rumen:['t-rumen','рубцовая защита'],prol:['t-prol','пролонг']};
 
@@ -553,7 +553,7 @@ function renderChart(ch){
     g+=`<text x="${x(30)}" y="${y(97)}" font-size="12" font-weight="800" fill="var(--accent-ink)">${esc(s1.name)}</text><text x="${x(30)}" y="${y(97)+16}" font-size="12" fill="var(--ink-soft)">серая — ${esc(s0.name)}</text>`;
     return `<div class="chart-wrap"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Кривая яйценоскости: с концентратом стадо дольше держится выше порога">${g}</svg></div>${ch.note?`<span class="calc-note">${esc(ch.note)}</span>`:''}`;
   }
-  return `<div class="bgroups">${ch.groups.map(gr=>{const m=Math.max(...gr.items.map(i=>i.v))||1;
+  return `<div class="bgroups">${ch.groups.map(gr=>{gr.items.forEach(i=>{if(!(i.v>0))i.v=0});const m=Math.max(...gr.items.map(i=>i.v))||1;
     return `<div class="bgroup"><h4>${esc(gr.title)}</h4>${gr.items.map(i=>`<div class="brow2"><span>${esc(i.l)}</span><div class="btrack2"><div class="bfill2 ${i.hi?'hi':''}" style="width:${Math.max(2,i.v/m*100)}%"></div></div><b>${esc(gr.fmt(i.v))}</b></div>`).join('')}</div>`}).join('')}</div>`;
 }
 let talkId='milk';
@@ -570,7 +570,7 @@ function renderTalk(ids){
   </div><div class="price-line"><b>Почему это окупается:</b> ${esc(t.price)}</div>`;
   t.calcs.forEach(id=>{const c=CALCS[id];
     h+=`<div class="calc" data-c="${id}"><h3>🧮 ${esc(c.title)}</h3><p class="hint">${esc(c.hint)}</p>
-    <div class="fields">${c.f.map(f=>`<label class="field" for="c-${id}-${f[0]}">${esc(f[1])}${f[5]?` <small>${esc(f[5])}</small>`:''}<span class="in"><input id="c-${id}-${f[0]}" type="number" inputmode="decimal" step="${f[3]}" value="${f[2]}" data-k="${f[0]}"><span class="u">${esc(f[4])}</span></span></label>`).join('')}</div>
+    <div class="fields">${c.f.map(f=>`<label class="field" for="c-${id}-${f[0]}">${esc(f[1])}${f[5]?` <small>${esc(f[5])}</small>`:''}<span class="in"><input id="c-${id}-${f[0]}" type="number" inputmode="decimal" min="0" step="${f[3]}" value="${f[2]}" data-k="${f[0]}"><span class="u">${esc(f[4])}</span></span></label>`).join('')}</div>
     <div class="cchart"></div>
     <div class="results" id="r-${id}"></div>
     <button class="reset" type="button">Вернуть значения по умолчанию</button>
@@ -578,7 +578,7 @@ function renderTalk(ids){
   $('#talk').innerHTML=h;
   $('#talk').querySelectorAll('.calc').forEach(box=>{
     const c=CALCS[box.dataset.c];
-    const calc=()=>{const v={};box.querySelectorAll('input').forEach(i=>v[i.dataset.k]=parseFloat(String(i.value).replace(',','.'))||0);
+    const calc=()=>{const v={};box.querySelectorAll('input').forEach(i=>{let n=parseFloat(String(i.value).replace(',','.'));if(!(n>=0)){n=0}if(String(i.value).trim().startsWith('-')){i.value=0}v[i.dataset.k]=n});
       const r=c.run(v);
       box.querySelector('.results').innerHTML=r.tiles.map(t=>`<div class="res ${t.k||''}"><span>${esc(t.l)}</span><b>${esc(t.v)}</b></div>`).join('');
       box.querySelector('.cchart').innerHTML=r.chart?renderChart(r.chart):''};

@@ -201,7 +201,7 @@ window.TALK=[
 //    chart.type 'payback' — партия куплена сразу, выгода копится по дням: где линии пересеклись — окупилось
 //    chart.type 'bars'    — сравнение столбиками: groups:[{title, items:[{l, v, hi}] , fmt}]
 // =====================================================================
-const money=x=>(x<0?'−':'')+'$'+Math.abs(Math.round(x)).toLocaleString('ru-RU');
+const money=x=>x<0?'не окупается':'$'+Math.round(x).toLocaleString('ru-RU');
 const money2=x=>'$'+Number(x).toLocaleString('ru-RU',{minimumFractionDigits:2,maximumFractionDigits:2});
 const num=(x,d=0)=>Number(x).toLocaleString('ru-RU',{maximumFractionDigits:d});
 const payback=(days,gainDay,cost,gainLabel,extra)=>{
@@ -233,7 +233,7 @@ window.CALCS={
    const per=milkCalf-(zcmCalf+muCalf), feedSave=per*v.heads, sold=v.heads*v.liters*v.days/1000, saved=v.heads*Math.min(v.mdrop,v.mort)/100, savedVal=saved*v.cv, tot=feedSave+savedVal;
    return {tiles:[{l:'Литр напитка: молоко / ЗЦМ',v:money2(v.milk)+' / '+money2(zl),k:zl<v.milk?'good':'bad'},
      {l:'Выпойка на телёнка: молоко',v:money(milkCalf)},{l:'ЗЦМ + Мюсли на телёнка',v:money(zcmCalf+muCalf),k:'good'},
-     {l:'Экономия на выпойке за год',v:money(feedSave),k:feedSave>=0?'good':'bad'},{l:'Сохранено телят за год',v:num(saved)+' гол. · '+money(savedVal),k:'good'},{l:'Итого выгода за год',v:money(tot),k:tot>=0?'hi':'bad'},
+     {l:'Экономия на выпойке за год',v:feedSave>=0?money(feedSave):'ЗЦМ дороже своего молока',k:feedSave>=0?'good':'bad'},{l:'Сохранено телят за год',v:num(saved)+' гол. · '+money(savedVal),k:'good'},{l:'Итого выгода за год',v:money(tot),k:tot>=0?'hi':'bad'},
      {l:'Молока уходит в продажу',v:num(sold,1)+' т в год',k:'good'}],
     chart:{type:'bars',groups:[{title:'Стоимость литра напитка',fmt:money2,items:[{l:'Цельное молоко',v:v.milk},{l:'ЗЦМ Ални-Милк',v:zl,hi:true}]},
       {title:'Выпойка одного телёнка',fmt:money,items:[{l:'Цельное молоко',v:milkCalf},{l:'ЗЦМ + Мюсли',v:zcmCalf+muCalf,hi:true}]},
