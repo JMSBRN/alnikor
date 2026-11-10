@@ -222,7 +222,7 @@ svg text{font-family:var(--body)}
 .krs-track::before{content:"";position:absolute;left:24px;right:24px;top:22px;height:4px;background:linear-gradient(90deg,var(--accent),var(--good));border-radius:2px}
 .kst{position:relative;display:flex;flex-direction:column;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px;margin-top:0}
 .kst.best{border:2px solid var(--accent);box-shadow:0 6px 18px rgba(226,98,27,.18)}
-.kdot{width:44px;height:44px;border-radius:50%;background:var(--card);border:3px solid var(--accent);display:grid;place-items:center;font-size:22px;position:relative;z-index:1;margin-top:-2px}
+.kdot{width:44px;height:44px;border-radius:50%;background:var(--card);border:3px solid var(--accent);display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:18px;color:var(--accent-ink);position:relative;z-index:1;margin-top:-2px}
 .kname{font-family:var(--display);font-size:15px}
 .kwhen{font-size:12px;color:var(--ink-soft);font-weight:700}
 .kitems{display:flex;flex-direction:column;gap:6px;flex:1}
@@ -632,19 +632,21 @@ function renderKRS(){
     {l:'Больше всего денег приносит',v:most?most.st.name+' · '+money(most.g-most.c):'выберите продукты',k:'hi'}
   ].map(t=>`<div class="res ${t.k||''}"><span>${esc(t.l)}</span><b>${esc(t.v)}</b></div>`).join('');
   $('#krs-line').innerHTML=`<div class="krs-track">${per.map(p=>{const st=p.st;const items=KRS.items.filter(i=>i.stage===st.id);
-    return `<div class="kst ${best&&best.st.id===st.id?'best':''}"><div class="kdot" aria-hidden="true">${st.emo}</div><b class="kname">${esc(st.name)}</b><span class="kwhen">${esc(st.when)}</span>
+    return `<div class="kst ${best&&best.st.id===st.id?'best':''}"><div class="kdot" aria-hidden="true">${KRS.stages.indexOf(st)+1}</div><b class="kname">${esc(st.name)}</b><span class="kwhen">${esc(st.when)}</span>
     <div class="kitems">${items.map(i=>`<button type="button" class="kchip" aria-pressed="${krsOn.has(i.id)}" data-i="${i.id}"><b>${esc(i.name)}</b><small>${esc(i.benefit)}</small><em>$${num(i.gain-i.cost,1)} на голову</em></button>`).join('')}</div>
     <div class="ksum"><span>вложено ${money(p.c)}</span><span class="kg">выгода ${money(p.g)}</span><b>${p.c?'чистыми '+money(p.g-p.c):'не выбрано'}</b></div></div>`}).join('')}</div>`;
   $('#krs-line').querySelectorAll('.kchip').forEach(b=>b.onclick=()=>{const id=b.dataset.i;krsOn.has(id)?krsOn.delete(id):krsOn.add(id);renderKRS()});
   // chart: columns per stage
-  const W=760,H=280,L=60,R=16,T=20,B=58,max=Math.max(1,...per.map(p=>Math.max(p.c,p.g)))*1.15,cw=(W-L-R)/per.length;
+  if(tc===0){$('#krs-chart').innerHTML='<p class="empty">Выберите продукты на линии этапов — здесь появится график вложений и выгоды.</p>';}
+  else{
+  const W=760,H=270,L=60,R=16,T=20,B=48,max=Math.max(1,...per.map(p=>Math.max(p.c,p.g)))*1.15,cw=(W-L-R)/per.length;
   const y=v=>T+(1-v/max)*(H-T-B);let g='';
   for(let i=0;i<=4;i++){const v=max/4*i;g+=`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${L-6}" y="${y(v)+4}" text-anchor="end" font-size="11" fill="var(--ink-soft)">${money(v)}</text>`}
   per.forEach((p,k)=>{const x0=L+k*cw+cw*0.15,bw=cw*0.32;
     g+=`<rect x="${x0}" y="${y(p.c)}" width="${bw}" height="${y(0)-y(p.c)}" rx="3" fill="var(--ink-soft)" opacity=".55"/><rect x="${x0+bw+2}" y="${y(p.g)}" width="${bw}" height="${y(0)-y(p.g)}" rx="3" fill="var(--accent)"/>`;
-    g+=`<text x="${L+k*cw+cw/2}" y="${H-B+18}" text-anchor="middle" font-size="16">${p.st.emo}</text><text x="${L+k*cw+cw/2}" y="${H-B+36}" text-anchor="middle" font-size="11" fill="var(--ink-soft)">${esc(p.st.name)}</text>`});
+    g+=`<text x="${L+k*cw+cw/2}" y="${H-B+20}" text-anchor="middle" font-size="12" fill="var(--ink-soft)">${esc(p.st.name)}</text>`});
   g+=`<rect x="${L}" y="${H-12}" width="12" height="10" fill="var(--ink-soft)" opacity=".55"/><text x="${L+16}" y="${H-3}" font-size="11" fill="var(--ink-soft)">вложения</text><rect x="${L+90}" y="${H-12}" width="12" height="10" fill="var(--accent)"/><text x="${L+106}" y="${H-3}" font-size="11" fill="var(--ink-soft)">выгода</text>`;
-  $('#krs-chart').innerHTML=`<div class="chart-wrap"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Вложения и выгода по этапам">${g}</svg></div>`;
+  $('#krs-chart').innerHTML=`<div class="chart-wrap"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Вложения и выгода по этапам">${g}</svg></div>`;}
   $('#krs-how').innerHTML=KRS.items.map(i=>`<li><b>${esc(i.name)}</b> (${esc(KRS.stages.find(s=>s.id===i.stage).name)}): ${esc(i.how)}</li>`).join('')+`<li>Молоко $${K.milkPrice}/кг</li>`;
 }
 $('#krs-heads').addEventListener('input',renderKRS);
