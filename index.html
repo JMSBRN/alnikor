@@ -48,6 +48,16 @@ button{font:inherit;color:inherit}
 .stat b{display:block;font-family:var(--display);font-size:24px;color:#F59A62}
 .stat span{font-size:13px;color:var(--navy-soft)}
 
+/* Миссия */
+.mission{background:var(--accent-soft);border-bottom:1px solid var(--line)}
+.mission-in{display:grid;grid-template-columns:minmax(260px,1fr) 2fr;gap:24px;padding-top:24px;padding-bottom:24px;align-items:center}
+.mission .eyebrow{color:var(--accent-ink)}
+.mission h2{font-size:clamp(20px,2.4vw,26px);margin-top:6px}
+.mission-list{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.mission-list li{background:var(--card);border-radius:14px;padding:12px 14px;font-size:14px;color:var(--ink-soft)}
+.mission-list b{display:block;color:var(--ink);font-size:15px;margin-bottom:2px}
+@media (max-width:760px){.mission-in{grid-template-columns:1fr}}
+
 /* Вкладки */
 .tabs-bar{position:sticky;top:0;z-index:5;background:var(--paper);border-bottom:1px solid var(--line)}
 .tabs{display:flex;gap:8px;overflow-x:auto;padding:14px 0;scrollbar-width:thin}
@@ -212,6 +222,21 @@ footer{background:var(--navy);color:var(--navy-ink);margin-top:30px;padding:28px
   </div>
 </header>
 
+<section class="mission">
+  <div class="wrap mission-in">
+    <div class="mission-text">
+      <div class="eyebrow">Главная задача Алникор</div>
+      <h2>Убрать человеческий фактор и дать стабильность — от рождения до старости животного</h2>
+    </div>
+    <ul class="mission-list">
+      <li><b>Готовая схема на каждый этап.</b> Продукт уже рассчитан под возраст и период — не нужно смешивать «на глаз».</li>
+      <li><b>Дозу берёт само животное.</b> Через воду и дозатор корова пьёт сколько нужно и получает ровно свою дозу.</li>
+      <li><b>Без пиков.</b> Пролонгированные и защищённые формы высвобождаются равномерно — организм работает ровно.</li>
+      <li><b>Контроль специалистов.</b> Анализ кормов, расчёт рационов и проверка на ферме в «Программе 15000+».</li>
+    </ul>
+  </div>
+</section>
+
 <div class="tabs-bar">
   <div class="wrap">
     <div class="tabs" role="tablist" id="tabs"></div>
@@ -369,7 +394,7 @@ footer{background:var(--navy);color:var(--navy-ink);margin-top:30px;padding:28px
   </div>
 </footer>
 
-<script src="data.js?v=6"></script>
+<script src="data.js?v=7"></script>
 <script>
 const TAGS={chel:['t-chel','хелаты'],rumen:['t-rumen','рубцовая защита'],prol:['t-prol','пролонг']};
 
