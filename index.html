@@ -369,7 +369,7 @@ footer{background:var(--navy);color:var(--navy-ink);margin-top:30px;padding:28px
   </div>
 </footer>
 
-<script src="data.js?v=5"></script>
+<script src="data.js?v=6"></script>
 <script>
 const TAGS={chel:['t-chel','хелаты'],rumen:['t-rumen','рубцовая защита'],prol:['t-prol','пролонг']};
 
@@ -463,6 +463,23 @@ function renderChart(ch){
     if(pb<=ch.days){g+=`<line x1="${x(pb)}" x2="${x(pb)}" y1="${y(ch.cost)}" y2="${y(0)}" stroke="var(--good)" stroke-width="2"/><circle cx="${x(pb)}" cy="${y(ch.cost)}" r="7" fill="var(--good)"/>`;
       g+=`<text x="${x(pb)}" y="${y(0)-8}" text-anchor="middle" font-size="12" font-weight="800" fill="var(--good)" paint-order="stroke" stroke="var(--card)" stroke-width="4">окупилось: ${Math.ceil(pb)}-й день</text>`}
     return `<div class="chart-wrap"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Окупаемость: вложено ${money(ch.cost)}, выгода за период ${money(total)}">${g}</svg></div>`;
+  }
+  if(ch.type==='lines'){
+    const W=760,H=300,L=56,R=24,T=24,B=46;
+    const x=w=>L+(w-ch.xMin)/(ch.xMax-ch.xMin)*(W-L-R), y=v=>T+(1-v/ch.yMax)*(H-T-B);
+    let g='';
+    for(let v=0;v<=ch.yMax;v+=20){g+=`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text x="${L-8}" y="${y(v)+4}" text-anchor="end" font-size="12" fill="var(--ink-soft)">${v}</text>`}
+    const step=Math.ceil((ch.xMax-ch.xMin)/8/5)*5;
+    for(let w=Math.ceil(ch.xMin/step)*step;w<=ch.xMax;w+=step){g+=`<text x="${x(w)}" y="${H-B+20}" text-anchor="middle" font-size="12" fill="var(--ink-soft)">${w}</text>`}
+    g+=`<text x="${L}" y="14" font-size="12" fill="var(--ink-soft)">${esc(ch.yLabel)}</text><text x="${W-R}" y="${H-6}" text-anchor="end" font-size="12" fill="var(--ink-soft)">${esc(ch.xLabel)}</text>`;
+    const [s0,s1]=ch.series;
+    g+=`<path d="M${x(s0.end)} ${y(ch.threshold)} L${x(s1.end)} ${y(ch.threshold)} L${x(s1.end)} ${y(0)} L${x(s0.end)} ${y(0)} Z" fill="var(--good)" opacity=".15"/>`;
+    g+=`<text x="${(x(s0.end)+x(s1.end))/2}" y="${y(ch.threshold/2)}" text-anchor="middle" font-size="12" font-weight="800" fill="var(--good)">+${Math.round(s1.end-s0.end)} нед.</text>`;
+    g+=`<line x1="${L}" x2="${W-R}" y1="${y(ch.threshold)}" y2="${y(ch.threshold)}" stroke="var(--accent-ink)" stroke-dasharray="7 5"/><text x="${W-R}" y="${y(ch.threshold)-6}" text-anchor="end" font-size="12" font-weight="700" fill="var(--accent-ink)">${esc(ch.thLabel)}</text>`;
+    ch.series.forEach(se=>{const pts=se.pts.filter(p=>p[0]<=se.end+0.01);g+=`<path d="${pts.map((p,i)=>(i?'L':'M')+x(p[0]).toFixed(1)+' '+y(p[1]).toFixed(1)).join('')}" fill="none" stroke="${se.hi?'var(--accent)':'var(--ink-soft)'}" stroke-width="${se.hi?4.5:3}"/>`;
+      g+=`<circle cx="${x(se.end)}" cy="${y(ch.threshold)}" r="5" fill="${se.hi?'var(--accent)':'var(--ink-soft)'}"/>`});
+    g+=`<text x="${x(30)}" y="${y(97)}" font-size="12" font-weight="800" fill="var(--accent-ink)">${esc(s1.name)}</text><text x="${x(30)}" y="${y(97)+16}" font-size="12" fill="var(--ink-soft)">серая — ${esc(s0.name)}</text>`;
+    return `<div class="chart-wrap"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Кривая яйценоскости: с концентратом стадо дольше держится выше порога">${g}</svg></div>${ch.note?`<span class="calc-note">${esc(ch.note)}</span>`:''}`;
   }
   return `<div class="bgroups">${ch.groups.map(gr=>{const m=Math.max(...gr.items.map(i=>i.v))||1;
     return `<div class="bgroup"><h4>${esc(gr.title)}</h4>${gr.items.map(i=>`<div class="brow2"><span>${esc(i.l)}</span><div class="btrack2"><div class="bfill2 ${i.hi?'hi':''}" style="width:${Math.max(2,i.v/m*100)}%"></div></div><b>${esc(gr.fmt(i.v))}</b></div>`).join('')}</div>`}).join('')}</div>`;
