@@ -198,6 +198,22 @@ svg text{font-family:var(--body)}
 .bfill2.hi{background:var(--accent)}
 .brow2 b{font-family:var(--display);font-size:16px;font-variant-numeric:tabular-nums}
 
+/* Простой калькулятор */
+.ctrl{display:flex;flex-direction:column;gap:12px}
+.hlabel{font-weight:700;font-size:15px}
+.hlabel b{font-family:var(--display);color:var(--accent-ink);font-size:20px;margin-left:4px}
+.hrange{width:100%;accent-color:var(--accent);height:28px}
+.toggles{display:flex;flex-wrap:wrap;gap:8px}
+.tog{display:flex;align-items:center;gap:10px;background:var(--paper);border:2px solid var(--line);border-radius:14px;padding:10px 14px;cursor:pointer}
+.tog:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
+.tog input{width:20px;height:20px;accent-color:var(--accent)}
+.tog span{display:flex;flex-direction:column}
+.tog small{color:var(--ink-soft);font-size:12px}
+.how{font-size:13px;color:var(--ink-soft)}
+.how summary{cursor:pointer;font-weight:700}
+.how ul{margin:6px 0;padding-left:18px}
+.how p{margin:0}
+
 /* Отёл */
 .ctl{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
 .cstep{background:var(--card);border:1px solid var(--line);border-top:6px solid var(--ink-soft);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:6px}
@@ -420,7 +436,7 @@ footer{background:var(--navy);color:var(--navy-ink);margin-top:30px;padding:28px
   </div>
 </footer>
 
-<script src="data.js?v=9"></script>
+<script src="data.js?v=10"></script>
 <script>
 const TAGS={chel:['t-chel','хелаты'],rumen:['t-rumen','рубцовая защита'],prol:['t-prol','пролонг']};
 
@@ -568,22 +584,27 @@ function renderTalk(ids){
     <div class="tbox offer"><h3>Наше решение</h3><p style="margin:0;font-size:15px">${esc(t.offer)}</p></div>
     <div class="tbox value"><h3>Что вы получаете</h3><ul>${t.value.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
   </div><div class="price-line"><b>Почему это окупается:</b> ${esc(t.price)}</div>`;
-  t.calcs.forEach(id=>{const c=CALCS[id];
-    h+=`<div class="calc" data-c="${id}"><h3>🧮 ${esc(c.title)}</h3><p class="hint">${esc(c.hint)}</p>
-    <div class="fields">${c.f.map(f=>`<label class="field" for="c-${id}-${f[0]}">${esc(f[1])}${f[5]?` <small>${esc(f[5])}</small>`:''}<span class="in"><input id="c-${id}-${f[0]}" type="number" inputmode="decimal" min="0" step="${f[3]}" value="${f[2]}" data-k="${f[0]}"><span class="u">${esc(f[4])}</span></span></label>`).join('')}</div>
+  t.calcs.forEach(id=>{const c=CALCS[id],H=c.heads;
+    h+=`<div class="calc" data-c="${id}"><h3>🧮 ${esc(c.title)}</h3>
+    <div class="ctrl">
+      <label class="hlabel" for="h-${id}">${esc(H.label)}: <b class="hval">${num(H.def)} ${esc(H.unit)}</b></label>
+      <input class="hrange" id="h-${id}" type="range" min="${H.min}" max="${H.max}" step="${H.step}" value="${H.def}">
+      <div class="toggles" role="group" aria-label="Продукты Алникор">${c.products.map(p=>`<label class="tog"><input type="checkbox" data-p="${p.id}" ${p.on?'checked':''}><span><b>${esc(p.name)}</b><small>${esc(p.desc)}</small></span></label>`).join('')}</div>
+    </div>
+    <div class="results"></div>
     <div class="cchart"></div>
-    <div class="results" id="r-${id}"></div>
-    <button class="reset" type="button">Вернуть значения по умолчанию</button>
-    <span class="calc-note">Значения по умолчанию — для примера. Введите цифры вашего хозяйства; актуальную цену продукта уточните у менеджера Алникор. Результат зависит от рациона и условий содержания.</span></div>`;});
+    <details class="how"><summary>Как считаем</summary><ul></ul><p>Цифры ориентировочные: точный расчёт под ваше хозяйство сделает специалист Алникор.</p></details>
+    </div>`;});
   $('#talk').innerHTML=h;
   $('#talk').querySelectorAll('.calc').forEach(box=>{
-    const c=CALCS[box.dataset.c];
-    const calc=()=>{const v={};box.querySelectorAll('input').forEach(i=>{let n=parseFloat(String(i.value).replace(',','.'));if(!(n>=0)){n=0}if(String(i.value).trim().startsWith('-')){i.value=0}v[i.dataset.k]=n});
-      const r=c.run(v);
-      box.querySelector('.results').innerHTML=r.tiles.map(t=>`<div class="res ${t.k||''}"><span>${esc(t.l)}</span><b>${esc(t.v)}</b></div>`).join('');
-      box.querySelector('.cchart').innerHTML=r.chart?renderChart(r.chart):''};
-    box.querySelectorAll('input').forEach(i=>i.addEventListener('input',calc));
-    box.querySelector('.reset').onclick=()=>{c.f.forEach(f=>box.querySelector(`[data-k="${f[0]}"]`).value=f[2]);calc()};
+    const c=CALCS[box.dataset.c], r=box.querySelector('.hrange');
+    const calc=()=>{const n=Math.max(0,+r.value||0), on={};box.querySelectorAll('[data-p]').forEach(i=>on[i.dataset.p]=i.checked);
+      box.querySelector('.hval').textContent=num(n)+' '+c.heads.unit;
+      const res=c.run(n,on);
+      box.querySelector('.results').innerHTML=res.tiles.map(t=>`<div class="res ${t.k||''}"><span>${esc(t.l)}</span><b>${esc(t.v)}</b></div>`).join('');
+      box.querySelector('.cchart').innerHTML=res.chart?renderChart(res.chart):'';
+      box.querySelector('.how ul').innerHTML=(res.how||[]).map(x=>`<li>${esc(x)}</li>`).join('')};
+    r.addEventListener('input',calc);box.querySelectorAll('[data-p]').forEach(i=>i.addEventListener('change',calc));
     calc();
   });
 }

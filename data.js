@@ -161,7 +161,7 @@ window.TALK=[
   offer:'«Программа 15000+»: продукт под каждый этап — от сухостоя до поддержания удоя — плюс расчёт рационов и контроль на вашей ферме специалистами Алникор.',
   value:['Рубиферм: +1–3 л молока на корову в сутки','Проамид заменяет 0,5–1 кг соевого шрота в сутки','СК-500: меньше родильного пареза и задержания последа','Ални-Spezial снижает соматику, без срока ожидания — молоко не нужно выливать','Высокий пик — длиннее лактация (см. график ниже)'],
   price:'Добавка на одну корову в сутки стоит меньше, чем молоко, которое она помогает получить. Проверьте на цифрах своего хозяйства в калькуляторе ниже.',
-  calcs:['milk','soy']},
+  calcs:['milk']},
  {id:'calves',emo:'🍼',name:'Телята и молодняк',
   pain:['Избежать падежа: сохранить каждого телёнка в первый месяц','Не выпаивать телятам молоко, которое можно продать','Мягко перевести телёнка с молока на твёрдые корма'],
   offer:'Программа «Мюсли → Малыш», концентраты 0-6 и 6-24, Адаптомилк и Элафид для здоровья кишечника.',
@@ -195,95 +195,83 @@ window.TALK=[
 ];
 
 // =====================================================================
-//  КАЛЬКУЛЯТОРЫ (в долларах США). Значения по умолчанию — для примера; клиент вводит свои цифры.
-//  f — поля: [ключ, подпись, значение по умолчанию, шаг, единица, подсказка]
-//  run(v) — расчёт: {tiles:[плитки], chart:{...}}
-//    chart.type 'payback' — партия куплена сразу, выгода копится по дням: где линии пересеклись — окупилось
-//    chart.type 'bars'    — сравнение столбиками: groups:[{title, items:[{l, v, hi}] , fmt}]
+//  КАЛЬКУЛЯТОРЫ — простые: клиент выбирает поголовье и продукты, выгода считается сама.
+//  Все цены и эффекты — в блоке K ниже (правьте здесь). Цены — в долларах США, для примера.
+//  heads — ползунок поголовья; products — переключатели; run(n, on) — расчёт
 // =====================================================================
-const money=x=>x<0?'не окупается':'$'+Math.round(x).toLocaleString('ru-RU');
-const money2=x=>'$'+Number(x).toLocaleString('ru-RU',{minimumFractionDigits:2,maximumFractionDigits:2});
-const num=(x,d=0)=>Number(x).toLocaleString('ru-RU',{maximumFractionDigits:d});
-const payback=(days,gainDay,cost,gainLabel,extra)=>{
-  const gain=gainDay*days, profit=gain-cost, roi=cost>0?gain/cost:0, pb=gainDay>0?cost/gainDay:Infinity;
-  return {tiles:[...(extra||[]),
-    {l:gainLabel,v:money(gain),k:'good'},
-    {l:'Затраты на продукт',v:money(cost)},
-    {l:'Чистая выгода',v:money(profit),k:profit>=0?'good':'bad'},
-    {l:'Отдача на $1 вложений',v:'$'+num(roi,1),k:roi>=1?'hi':'bad'},
-    {l:'Окупаемость',v:pb<=days?'на '+num(Math.ceil(pb))+'-й день':'не окупается за период',k:pb<=days?'hi':'bad'}],
-   chart:{type:'payback',days,gainDay,cost,gainLabel}};
+const K={
+  milkPrice:0.35,                 // $/кг молока
+  rub:{gain:1.5,dose:100,price:2},          // Рубиферм: +1,5 л/сут (каталог 1–3 л), 100 г/сут, $/кг
+  pro:{soy:0.75,soyPrice:0.6,dose:130,price:2.5}, // Проамид: заменяет 0,75 кг шрота (каталог 0,5–1), ~130 г/сут для коровы 650 кг
+  lact:305,                       // дней лактации
+  calf:{liters:6,days:60,zcm:2.2,dil:9.5,mu:0.9,muKg:0.5,muDays:27,early:7,mort:3,value:300,health:8},
+  broiler:{weight:2.5,yield:72,carc:2.2,wplus:3,surv:1,fcr:1.75,concCost:8,feedPrice:0.38,alnFcr:0.03,alnCost:2},
+  layer:{weeks:60,extra:4,rate:78,egg:0.08,feed:115,share:2,price:1.4},
+  chel:{sulfNorm:200,sulfMetal:35,sulfAbs:30,chelMetal:24,chelAbs:90,sulfPrice:1.5,chelPrice:8},
+  hyg:{m2:5,dose:75,every:2.5,price:0.9,treat:40}
 };
+const money=x=>x<0?'не окупается':'$'+Math.round(x).toLocaleString('ru-RU');
+const money2=x=>'$'+Number(Math.max(0,x)).toLocaleString('ru-RU',{minimumFractionDigits:2,maximumFractionDigits:2});
+const num=(x,d=0)=>Number(Math.max(0,x)).toLocaleString('ru-RU',{maximumFractionDigits:d});
+const ret=(gain,cost)=>[{l:'Ваша чистая выгода',v:money(gain-cost),k:gain>=cost?'hi':'bad'},{l:'Каждый вложенный $1 возвращает',v:cost>0?'$'+num(gain/cost,1):'—',k:'good'}];
+
 window.CALCS={
- milk:{title:'Прибавка молока от добавки',hint:'Рубиферм по каталогу даёт +1–3 л молока в сутки. Для других продуктов прибавку подскажет специалист Алникор.',
-  f:[['heads','Коров, голов',100,10,'гол.'],['days','Дней применения',100,10,'дн.'],['gain','Прибавка молока',1.5,0.1,'л/гол/сут','Рубиферм: 1–3 л'],
-     ['milk','Цена молока',0.35,0.01,'$/кг','для примера'],['dose','Доза продукта',100,5,'г/гол/сут','Рубиферм: 100 г'],['price','Цена продукта',2,0.1,'$/кг','уточните у менеджера']],
-  run:v=>payback(v.days,v.heads*v.gain*v.milk,v.heads*v.days*v.dose/1000*v.price,'Доход от доп. молока',[{l:'Дополнительно молока',v:num(v.heads*v.days*v.gain)+' кг'}])},
- soy:{title:'Проамид вместо соевого шрота',hint:'По каталогу суточная доза Проамида заменяет 0,5–1 кг соевого шрота. Доза — 10–30 г на 100 кг массы.',
-  f:[['heads','Коров, голов',100,10,'гол.'],['days','Дней применения',200,10,'дн.'],['weight','Масса коровы',650,10,'кг'],['dose','Доза Проамида',20,1,'г на 100 кг','каталог: 10–30'],
-     ['price','Цена Проамида',2.5,0.1,'$/кг','уточните у менеджера'],['soy','Замещается соевого шрота',0.75,0.05,'кг/гол/сут','каталог: 0,5–1'],['soyPrice','Цена соевого шрота',0.6,0.01,'$/кг','для примера']],
-  run:v=>{const pd=v.weight/100*v.dose;return payback(v.days,v.heads*v.soy*v.soyPrice,v.heads*v.days*pd/1000*v.price,'Экономия на шроте',[{l:'Шрота сэкономлено',v:num(v.heads*v.days*v.soy/1000,1)+' т'}])}},
- calves:{title:'Телята: сохранность, выпойка ЗЦМ и Мюсли',hint:'Главное в телятах — сохранить каждого: Мюсли и Малыш по каталогу снижают поносы в первый месяц, Адаптомилк предупреждает диарею при смене корма, Элафид быстро её останавливает. Ални-Милк разводят 1 : 8–9 с водой, то есть 1 кг ЗЦМ даёт 9–10 л напитка. Сэкономленное цельное молоко хозяйство продаёт. Мюсли по каталогу дают с 3 по 30 день, около 0,5 кг в сутки: рубец развивается раньше, телёнка можно раньше и мягче перевести с жидких кормов.',
-  f:[['heads','Телят в год',200,10,'гол.'],['liters','Выпойка в сутки',6,0.5,'л/гол'],['days','Дней выпойки',60,5,'дн.'],['milk','Цена своего молока',0.35,0.01,'$/кг','цена реализации'],
-     ['zcm','Цена ЗЦМ Ални-Милк',2.2,0.1,'$/кг','уточните у менеджера'],['dil','Напитка из 1 кг ЗЦМ',9.5,0.5,'л','каталог: 1 : 8–9'],
-     ['mu','Цена Мюсли',0.9,0.05,'$/кг','уточните у менеджера'],['early','Отъём раньше с Мюсли',7,1,'дн.','для примера'],
-     ['mort','Падёж телят сейчас',8,0.5,'%'],['mdrop','Снижение падежа',3,0.5,'п. п.','для примера'],['cv','Стоимость телёнка',300,10,'$','для примера']],
-  run:v=>{const ld=v.days-v.early, zl=v.zcm/v.dil;
-   const milkCalf=v.liters*v.days*v.milk, zcmCalf=v.liters*ld*zl, muCalf=0.5*27*v.mu;
-   const per=milkCalf-(zcmCalf+muCalf), feedSave=per*v.heads, sold=v.heads*v.liters*v.days/1000, saved=v.heads*Math.min(v.mdrop,v.mort)/100, savedVal=saved*v.cv, tot=feedSave+savedVal;
-   return {tiles:[{l:'Литр напитка: молоко / ЗЦМ',v:money2(v.milk)+' / '+money2(zl),k:zl<v.milk?'good':'bad'},
-     {l:'Выпойка на телёнка: молоко',v:money(milkCalf)},{l:'ЗЦМ + Мюсли на телёнка',v:money(zcmCalf+muCalf),k:'good'},
-     {l:'Экономия на выпойке за год',v:feedSave>=0?money(feedSave):'ЗЦМ дороже своего молока',k:feedSave>=0?'good':'bad'},{l:'Сохранено телят за год',v:num(saved)+' гол. · '+money(savedVal),k:'good'},{l:'Итого выгода за год',v:money(tot),k:tot>=0?'hi':'bad'},
-     {l:'Молока уходит в продажу',v:num(sold,1)+' т в год',k:'good'}],
-    chart:{type:'bars',groups:[{title:'Стоимость литра напитка',fmt:money2,items:[{l:'Цельное молоко',v:v.milk},{l:'ЗЦМ Ални-Милк',v:zl,hi:true}]},
-      {title:'Выпойка одного телёнка',fmt:money,items:[{l:'Цельное молоко',v:milkCalf},{l:'ЗЦМ + Мюсли',v:zcmCalf+muCalf,hi:true}]},
-      {title:'Падёж телят за год',fmt:x=>num(x)+' гол.',items:[{l:'Как сейчас',v:v.heads*v.mort/100},{l:'С программой',v:v.heads*Math.max(0,v.mort-v.mdrop)/100,hi:true}]},
-      {title:'Выгода за год',fmt:money,items:[{l:'Экономия на выпойке',v:Math.max(0,feedSave),hi:true},{l:'Сохранённые телята',v:savedVal,hi:true}]}]}}}},
- broiler:{title:'Бройлеры: больше мяса в тушке на том же корме',hint:'По каталогу концентраты Стартер → Финишер ускоряют рост, набирают вес за счёт мышц, улучшают конверсию и снижают выбытие. Ожидаемые прибавки по вашему поголовью поможет оценить специалист Алникор.',
-  f:[['heads','Бройлеров за цикл',20000,1000,'гол.'],['weight','Живой вес на убой',2.5,0.1,'кг'],['wplus','Прибавка живого веса',3,0.5,'%','для примера'],
-     ['yield','Выход тушки',72,1,'%'],['carc','Цена тушки',2.2,0.05,'$/кг','для примера'],['surv','Выше сохранность',1,0.5,'п. п.','для примера'],
-     ['fcr','Конверсия',1.75,0.01,'кг корма/кг'],['feedPrice','Цена комбикорма',0.38,0.01,'$/кг','для примера'],['cprice','Доплата за концентрат',8,1,'$/т корма','уточните у менеджера']],
-  run:v=>{const c0=v.weight*v.yield/100, c1=v.weight*(1+v.wplus/100)*v.yield/100;
-   const meat=v.heads*(c1-c0)*v.carc, surv=v.heads*v.surv/100*c1*v.carc, feedT=v.heads*v.weight*(1+v.wplus/100)*v.fcr/1000, cost=feedT*v.cprice, gain=meat+surv;
-   return {tiles:[{l:'Тушка на птицу: было / стало',v:num(c0,2)+' / '+num(c1,2)+' кг',k:'good'},{l:'Доп. мяса за цикл',v:num(v.heads*(c1-c0)+v.heads*v.surv/100*c1)+' кг',k:'good'},
-     {l:'Доход: привес + сохранность',v:money(gain),k:'good'},{l:'Доплата за концентрат',v:money(cost)},{l:'Чистая выгода за цикл',v:money(gain-cost),k:gain>=cost?'hi':'bad'}],
-    chart:{type:'bars',groups:[{title:'Тушка на одну птицу',fmt:x=>num(x,2)+' кг',items:[{l:'Как сейчас',v:c0},{l:'С концентратом',v:c1,hi:true}]},
-      {title:'Деньги за цикл',fmt:money,items:[{l:'Доплата за концентрат',v:cost},{l:'Доход от привеса',v:meat,hi:true},{l:'Доход от сохранности',v:surv,hi:true}]}]}}}},
- layer:{title:'Несушки: дольше несётся — больше яиц',hint:'По каталогу «Несушка 3 %» (ввод 2 %) поддерживает высокую яйценоскость и сохранность на протяжении всех периодов яйцекладки и улучшает качество яйца. Сколько недель продуктивности добавит программа, поможет оценить специалист Алникор.',
-  f:[['heads','Кур-несушек',10000,500,'гол.'],['weeks','Период кладки сейчас',60,1,'нед.','с 20-й недели'],['extra','Дольше продуктивность',4,1,'нед.','для примера'],
-     ['rate','Яйценоскость в продлённый период',78,1,'%'],['egg','Цена яйца',0.08,0.005,'$','для примера'],['feed','Корма на курицу',115,5,'г/сут'],
-     ['share','Ввод концентрата',2,0.5,'%','каталог: 2 %'],['price','Цена концентрата',1.4,0.1,'$/кг','уточните у менеджера']],
-  run:v=>{const eggs=v.heads*v.extra*7*v.rate/100, gain=eggs*v.egg, cost=v.heads*(v.weeks+v.extra)*7*v.feed/1000*v.share/100*v.price;
-   const th=70, end0=20+v.weeks, end1=end0+v.extra, k0=(94-th)/Math.max(1,end0-26), k1=(94-th)/Math.max(1,end1-26);
-   const curve=(w,k)=>{if(w<20)return 0;if(w<26)return (w-20)/6*94;return Math.max(0,94-(w-26)*k)};
-   const xMax=Math.ceil(end1+6), pts=k=>Array.from({length:80},(_,i)=>{const w=18+i*(xMax-18)/79;return [w,curve(w,k)]});
-   return {tiles:[{l:'Дополнительно яиц',v:num(eggs)+' шт.',k:'good'},{l:'На одну курицу',v:'+'+num(eggs/v.heads)+' яиц',k:'good'},{l:'Доход от доп. яиц',v:money(gain),k:'good'},
-     {l:'Концентрат за весь период',v:money(cost)},{l:'Чистая выгода',v:money(gain-cost),k:gain>=cost?'hi':'bad'}],
-    chart:{type:'lines',xLabel:'возраст, недель',yLabel:'яйценоскость, %',xMin:18,xMax,yMax:100,threshold:th,thLabel:'порог выбраковки стада ~'+th+' %',
-      series:[{name:'как сейчас',pts:pts(k0),hi:false,end:end0},{name:'с концентратом — дольше на высоте',pts:pts(k1),hi:true,end:end1}],
-      note:'Схема: форма кривой — типовая, длительность — по вашим цифрам'}}}},
- chelate:{title:'Цена усвоенного металла: сульфат против хелата',hint:'Усвояемость — по данным Алникор: сульфат 30–35 %, хелат около 90 %. Содержание цинка: сульфат моногидрат ~35 %, Хелакор цинка 24 %.',
-  f:[['sPrice','Цена сульфата',1.5,0.1,'$/кг','для примера'],['sMetal','Металла в сульфате',35,1,'%'],['sAbs','Усвояемость сульфата',30,1,'%','30–35 %'],
-     ['cPrice','Цена Хелакора',8,0.5,'$/кг','уточните у менеджера'],['cMetal','Металла в Хелакоре',24,1,'%','каталог: 22–24'],['cAbs','Усвояемость хелата',90,1,'%','около 90 %']],
-  run:v=>{const sk=v.sPrice/(v.sMetal/100), ck=v.cPrice/(v.cMetal/100), s=sk/(v.sAbs/100), c=ck/(v.cAbs/100), dose=(v.sAbs/v.cAbs)*100;
-   return {tiles:[{l:'Разница в цене за кг металла',v:'×'+num(ck/sk,1)},{l:'Разница за усвоенный металл',v:'×'+num(c/s,1),k:'hi'},{l:'Норма хелата для того же эффекта',v:num(dose)+' % от нормы сульфата',k:'good'},{l:'Уходит в навоз: сульфат / хелат',v:num(100-v.sAbs)+' % / '+num(100-v.cAbs)+' %',k:'good'}],
-    chart:{type:'bars',groups:[{title:'Цена 1 кг металла в продукте',fmt:money,items:[{l:'Сульфат',v:sk},{l:'Хелакор',v:ck,hi:true}]},
-                               {title:'Цена 1 кг УСВОЕННОГО металла',fmt:money,items:[{l:'Сульфат',v:s},{l:'Хелакор',v:c,hi:true}]},
-                               {title:'Усваивается из 100 г металла',fmt:x=>num(x)+' г',items:[{l:'Сульфат',v:v.sAbs},{l:'Хелакор',v:v.cAbs,hi:true}]}]}}}},
- pets:{title:'Стоимость дня кормления: Holistic против Economy',hint:'Потребность собаки ≈ 110 × масса^0,75 ккал (взрослая, средняя активность). Калорийность и белок — из каталога: Holistic ягнёнок ~4 030 ккал, 32 % белка; Economy ~3 700 ккал, 16 % белка.',
-  f:[['w','Масса собаки',20,1,'кг'],['hp','Цена Holistic',9,0.5,'$/кг','для примера'],['hk','Калорийность Holistic',4030,10,'ккал/кг'],['hpr','Белок Holistic',32,1,'%'],
-     ['ep','Цена Economy',1.8,0.1,'$/кг','для примера'],['ek','Калорийность Economy',3700,10,'ккал/кг'],['epr','Белок Economy',16,1,'%']],
-  run:v=>{const need=110*Math.pow(v.w,0.75), hg=need/v.hk*1000, eg=need/v.ek*1000, hc=hg/1000*v.hp, ec=eg/1000*v.ep;
-   return {tiles:[{l:'Потребность в энергии',v:num(need)+' ккал/сут'},{l:'Holistic: порция · в день',v:num(hg)+' г · '+money2(hc),k:'hi'},{l:'Economy: порция · в день',v:num(eg)+' г · '+money2(ec)},{l:'Белка в день: Holistic / Economy',v:num(hg*v.hpr/100)+' г / '+num(eg*v.epr/100)+' г',k:'good'}],
-    chart:{type:'bars',groups:[{title:'Порция в день',fmt:x=>num(x)+' г',items:[{l:'Economy',v:eg},{l:'Holistic',v:hg,hi:true}]},
-                               {title:'Белок в порции',fmt:x=>num(x)+' г',items:[{l:'Economy',v:eg*v.epr/100},{l:'Holistic',v:hg*v.hpr/100,hi:true}]},
-                               {title:'Стоимость в месяц',fmt:money,items:[{l:'Economy',v:ec*30},{l:'Holistic',v:hc*30,hi:true}]}]}}}},
- hygiene:{title:'Алнисан: стоимость на голову',hint:'Норма по каталогу 50–100 г/м², в сырых местах 100–150 г/м², обработка каждые 2–3 дня.',
-  f:[['area','Площадь обработки',500,50,'м²'],['dose','Норма',75,5,'г/м²','каталог: 50–100'],['every','Обработка каждые',2.5,0.5,'дн.','каталог: 2–3'],
-     ['price','Цена Алнисана',0.9,0.05,'$/кг','уточните у менеджера'],['heads','Животных в помещении',100,10,'гол.'],['treat','Одно лечение копыт или мастита',40,5,'$','для примера']],
-  run:v=>{const kg=v.area*v.dose/1000*30/v.every, cost=kg*v.price, ph=cost/v.heads;
-   return {tiles:[{l:'Расход в месяц',v:num(kg)+' кг · '+num(Math.ceil(kg/15))+' пак. по 15 кг'},{l:'Стоимость в месяц',v:money(cost),k:'hi'},{l:'На голову в месяц',v:money2(ph),k:'good'},{l:'Одно лечение = месяцев защиты',v:num(v.treat/ph,1),k:'good'}],
-    chart:{type:'bars',groups:[{title:'На одну голову',fmt:money2,items:[{l:'Алнисан, месяц',v:ph,hi:true},{l:'Одно лечение',v:v.treat}]}]}}}}
+ milk:{title:'Дойное стадо: сколько вы заработаете за лактацию',
+  heads:{label:'Коров в стаде',min:10,max:2000,step:10,def:200,unit:'гол.'},
+  products:[{id:'rub',name:'Рубиферм',desc:'+1–3 л молока в сутки',on:true},{id:'pro',name:'Проамид',desc:'вместо 0,5–1 кг соевого шрота',on:true}],
+  run:(n,on)=>{const D=K.lact; let gDay=0,cost=0,milk=0,soy=0;
+   if(on.rub){milk=n*K.rub.gain*D; gDay+=n*K.rub.gain*K.milkPrice; cost+=n*D*K.rub.dose/1000*K.rub.price}
+   if(on.pro){soy=n*K.pro.soy*D; gDay+=n*K.pro.soy*K.pro.soyPrice; cost+=n*D*K.pro.dose/1000*K.pro.price}
+   return {tiles:[{l:'Дополнительно молока',v:num(milk/1000,1)+' т',k:'good'},{l:'Сэкономлено соевого шрота',v:num(soy/1000,1)+' т',k:'good'},...ret(gDay*D,cost)],
+    chart:{type:'payback',days:D,gainDay:gDay,cost,gainLabel:'Ваш доход'},
+    how:['Лактация 305 дней, цена молока $'+K.milkPrice+'/кг','Рубиферм: +1,5 л в сутки (каталог: 1–3 л), 100 г в сутки','Проамид: заменяет 0,75 кг соевого шрота в сутки (каталог: 0,5–1 кг)']}}},
+ calves:{title:'Телята: сохранность и экономия на выпойке за год',
+  heads:{label:'Телят в год',min:10,max:2000,step:10,def:200,unit:'гол.'},
+  products:[{id:'zcm',name:'ЗЦМ Ални-Милк',desc:'вместо своего молока',on:true},{id:'mu',name:'Мюсли',desc:'ранний рубец, раньше отъём',on:true},{id:'hl',name:'Адаптомилк + Элафид',desc:'против диареи и падежа',on:true}],
+  run:(n,on)=>{const c=K.calf, zl=c.zcm/c.dil, ld=c.days-(on.mu?c.early:0), lp=on.zcm?zl:K.milkPrice;
+   const base=n*c.liters*c.days*K.milkPrice, now=n*(c.liters*ld*lp+(on.mu?c.muKg*c.muDays*c.mu:0)+(on.hl?c.health:0));
+   const saved=on.hl?n*c.mort/100:0, gain=base-now+saved*c.value+n*(on.hl?c.health:0)+n*(on.mu?c.muKg*c.muDays*c.mu:0), cost=n*((on.mu?c.muKg*c.muDays*c.mu:0)+(on.hl?c.health:0));
+   const sold=on.zcm?n*c.liters*c.days/1000:0;
+   return {tiles:[{l:'Своего молока уходит в продажу',v:num(sold,1)+' т',k:'good'},{l:'Сохранено телят',v:num(saved)+' гол.',k:'good'},...ret(gain,cost)],
+    chart:{type:'bars',groups:[{title:'Выпойка одного телёнка',fmt:money,items:[{l:'Своим молоком',v:c.liters*c.days*K.milkPrice},{l:'С продуктами Алникор',v:c.liters*ld*lp+(on.mu?c.muKg*c.muDays*c.mu:0),hi:true}]},
+      {title:'Выгода за год',fmt:money,items:[{l:'Экономия на выпойке',v:base-n*c.liters*ld*lp-n*(on.mu?c.muKg*c.muDays*c.mu:0),hi:true},{l:'Сохранённые телята',v:saved*c.value,hi:true}]}]},
+    how:['Выпойка 6 л в сутки 60 дней, своё молоко $'+K.milkPrice+'/кг','ЗЦМ 1 : 8–9 (каталог): 1 кг даёт ~9,5 л напитка','Мюсли 0,5 кг в сутки с 3 по 30 день, отъём на 7 дней раньше (ориентир)','Адаптомилк + Элафид: падёж ниже на 3 п. п. (ориентир), телёнок $'+c.value]}}},
+ broiler:{title:'Бройлеры: больше мяса с каждого цикла',
+  heads:{label:'Бройлеров за цикл',min:1000,max:200000,step:1000,def:20000,unit:'гол.'},
+  products:[{id:'conc',name:'Концентраты Стартер → Финишер',desc:'привес за счёт мышц, сохранность',on:true},{id:'aln',name:'Алнитан',desc:'здоровье кишечника, конверсия',on:true}],
+  run:(n,on)=>{const b=K.broiler, w=b.weight*(1+(on.conc?b.wplus:0)/100), c0=b.weight*b.yield/100, c1=w*b.yield/100;
+   const fcr=b.fcr-(on.aln?b.alnFcr:0), feedT=n*w*fcr/1000, meat=n*(c1-c0)+(on.conc?n*b.surv/100*c1:0);
+   const gain=meat*b.carc+(on.aln?n*w*b.alnFcr*b.feedPrice:0), cost=feedT*((on.conc?b.concCost:0)+(on.aln?b.alnCost:0));
+   return {tiles:[{l:'Дополнительно мяса (тушка)',v:num(meat)+' кг',k:'good'},{l:'Тушка на одну птицу',v:num(c0,2)+' → '+num(c1,2)+' кг',k:'good'},...ret(gain,cost)],
+    chart:{type:'bars',groups:[{title:'Тушка на одну птицу',fmt:x=>num(x,2)+' кг',items:[{l:'Без продуктов',v:c0},{l:'С продуктами Алникор',v:c1,hi:true}]},
+      {title:'За один цикл',fmt:money,items:[{l:'Вложения',v:cost},{l:'Доход',v:gain,hi:true}]}]},
+    how:['Убойный вес 2,5 кг, выход тушки 72 %, тушка $'+b.carc+'/кг','Концентраты: +3 % живого веса и +1 п. п. сохранности (ориентир), доплата $8 на тонну корма','Алнитан: конверсия лучше на 0,03 (ориентир), 0,4 кг на тонну']}}},
+ layer:{title:'Несушки: стадо несётся дольше',
+  heads:{label:'Кур-несушек',min:1000,max:200000,step:1000,def:10000,unit:'гол.'},
+  products:[{id:'nes',name:'Несушка 3 %',desc:'яйценоскость и сохранность',on:true}],
+  run:(n,on)=>{const l=K.layer, ex=on.nes?l.extra:0, eggs=n*ex*7*l.rate/100, gain=eggs*l.egg, cost=on.nes?n*(l.weeks+ex)*7*l.feed/1000*l.share/100*l.price:0;
+   const th=70,end0=20+l.weeks,end1=end0+ex,k0=(94-th)/(end0-26),k1=(94-th)/Math.max(1,end1-26);
+   const curve=(w,k)=>w<20?0:w<26?(w-20)/6*94:Math.max(0,94-(w-26)*k), xMax=Math.ceil(end1+6), pts=k=>Array.from({length:80},(_,i)=>{const w=18+i*(xMax-18)/79;return [w,curve(w,k)]});
+   return {tiles:[{l:'Дольше несётся',v:'+'+num(ex)+' нед.',k:'good'},{l:'Дополнительно яиц',v:num(eggs)+' шт.',k:'good'},...ret(gain,cost)],
+    chart:{type:'lines',xLabel:'возраст, недель',yLabel:'яйценоскость, %',xMin:18,xMax,yMax:100,threshold:th,thLabel:'порог выбраковки ~'+th+' %',
+      series:[{name:'без продукта',pts:pts(k0),hi:false,end:end0},{name:'с «Несушкой 3 %» — дольше на высоте',pts:pts(k1),hi:true,end:end1}],note:'Схема: форма кривой — типовая'},
+    how:['Кладка 60 недель, продление на 4 недели (ориентир) при 78 % яйценоскости','Яйцо $'+l.egg+', корм 115 г в сутки, ввод концентрата 2 % (каталог)']}}},
+ chelate:{title:'Хелакор вместо сульфата: меньше ввод, меньше потерь',
+  heads:{label:'Комбикорма в месяц',min:10,max:10000,step:10,def:500,unit:'т'},
+  products:[{id:'chel',name:'Хелакор цинка',desc:'вместо сульфата цинка',on:true}],
+  run:(n,on)=>{const c=K.chel, metS=c.sulfNorm*c.sulfMetal/100, abs=metS*c.sulfAbs/100, metC=abs/(c.chelAbs/100), prodC=metC/(c.chelMetal/100);
+   const kgS=n*c.sulfNorm/1000, kgC=n*prodC/1000, lossS=n*(metS-abs)/1000, lossC=n*(metC-abs)/1000;
+   return {tiles:[{l:'Нужно продукта в месяц',v:on.chel?num(kgC)+' кг вместо '+num(kgS)+' кг':num(kgS)+' кг сульфата',k:'good'},{l:'Металла уходит в навоз',v:on.chel?num(lossC,1)+' кг вместо '+num(lossS,1)+' кг':num(lossS,1)+' кг',k:'good'},{l:'Животное получает столько же цинка',v:num(n*abs/1000,1)+' кг в месяц',k:'hi'}],
+    chart:{type:'bars',groups:[{title:'Ввод продукта в месяц',fmt:x=>num(x)+' кг',items:[{l:'Сульфат цинка',v:kgS},{l:'Хелакор цинка',v:on.chel?kgC:kgS,hi:true}]},
+      {title:'Цинк в навоз в месяц',fmt:x=>num(x,1)+' кг',items:[{l:'Сульфат цинка',v:lossS},{l:'Хелакор цинка',v:on.chel?lossC:lossS,hi:true}]}]},
+    how:['Норма сульфата цинка 200 г/т (35 % цинка), усвояемость 30 %','Хелакор цинка: 24 % цинка, усвояемость ~90 % (данные Алникор)','Расчёт на то же количество усвоенного цинка']}}},
+ hygiene:{title:'Алнисан: сколько стоит защита одной головы',
+  heads:{label:'Животных в помещении',min:10,max:5000,step:10,def:200,unit:'гол.'},
+  products:[{id:'aln',name:'Алнисан',desc:'сухая подстилка, −60–80 % аммиака',on:true}],
+  run:(n,on)=>{const h=K.hyg, kg=on.aln?n*h.m2*h.dose/1000*30/h.every:0, ph=on.aln?kg*h.price/n:0;
+   return {tiles:[{l:'Алнисана в месяц',v:num(kg)+' кг',k:'good'},{l:'Защита одной головы в месяц',v:money2(ph),k:'hi'},{l:'Одно лечение копыт или мастита стоит как',v:num(ph?h.treat/ph:0,1)+' мес. защиты',k:'good'}],
+    chart:{type:'bars',groups:[{title:'На одну голову',fmt:money2,items:[{l:'Алнисан, месяц',v:ph,hi:true},{l:'Одно лечение',v:h.treat}]}]},
+    how:['5 м² на голову, 75 г на м² (каталог: 50–100), обработка каждые 2,5 дня (каталог: 2–3)','Алнисан $'+h.price+'/кг, одно лечение $'+h.treat]}}}
 };
 
 // =====================================================================
