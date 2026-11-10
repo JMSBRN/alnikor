@@ -58,6 +58,31 @@ button{font:inherit;color:inherit}
 .mission-list b{display:block;color:var(--ink);font-size:15px;margin-bottom:2px}
 @media (max-width:760px){.mission-in{grid-template-columns:1fr}}
 
+/* Верхнее меню */
+.topnav{position:sticky;top:0;z-index:10;background:var(--navy);border-bottom:1px solid rgba(255,255,255,.12)}
+.topnav-in{display:flex;align-items:center;gap:16px;padding-top:10px;padding-bottom:10px}
+.logo{font-family:var(--display);font-weight:800;font-size:20px;color:var(--navy-ink);text-decoration:none;flex:0 0 auto}
+.navlinks{display:flex;gap:4px;overflow-x:auto;flex:1;scrollbar-width:none}
+.navlinks a{flex:0 0 auto;color:var(--navy-soft);text-decoration:none;font-weight:700;font-size:15px;padding:8px 12px;border-radius:10px;white-space:nowrap}
+.navlinks a:hover{color:var(--navy-ink);background:rgba(255,255,255,.08)}
+.navlinks a[aria-current="page"]{color:var(--navy);background:#F59A62}
+.navlinks .soon{font-size:11px;font-weight:800;margin-left:4px;opacity:.8}
+#q{flex:0 1 260px;min-width:120px;font:inherit;font-size:14px;padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:var(--navy-ink)}
+#q::placeholder{color:var(--navy-soft)}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+@media (max-width:760px){.topnav-in{flex-wrap:wrap}.navlinks{order:3;flex-basis:100%}#q{flex:1}}
+.subnav-title{font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);margin:0 0 8px}
+.dirs{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.dir{display:flex;flex-direction:column;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;text-decoration:none;color:var(--ink);transition:border-color .15s, transform .15s}
+.dir:hover{border-color:var(--accent);transform:translateY(-2px)}
+.dir .d-emo{font-size:40px}
+.dir b{font-family:var(--display);font-size:18px}
+.dir span{font-size:14px;color:var(--ink-soft)}
+.dir .go{color:var(--accent-ink);font-weight:800;font-size:14px;margin-top:auto}
+.soon-box{background:var(--card);border:2px dashed var(--line);border-radius:18px;padding:28px;display:flex;flex-direction:column;gap:8px;max-width:760px}
+.soon-box p{margin:0;color:var(--ink-soft)}
+.hidden{display:none!important}
+
 /* Вкладки */
 .tabs-bar{position:sticky;top:0;z-index:5;background:var(--paper);border-bottom:1px solid var(--line)}
 .tabs{display:flex;gap:8px;overflow-x:auto;padding:14px 0;scrollbar-width:thin}
@@ -206,12 +231,20 @@ footer{background:var(--navy);color:var(--navy-ink);margin-top:30px;padding:28px
 </head>
 <body>
 
-<header class="hero">
+<nav class="topnav" aria-label="Разделы">
+  <div class="wrap topnav-in">
+    <a href="#home" class="logo">Алникор</a>
+    <div class="navlinks" id="nav"></div>
+    <label for="q" class="vh">Поиск продукта</label><input id="q" type="search" placeholder="Поиск: печень, диарея, хелат…">
+  </div>
+</nav>
+
+<header class="hero" id="hero">
   <div class="wrap hero-row">
     <div>
       <div class="eyebrow">Научно-исследовательское предприятие · Гродно</div>
       <h1>Алникор</h1>
-      <p class="lead">Корма, добавки и сырьевые компоненты. Выберите животное — увидите, какие продукты ему нужны на каждом этапе и что они дают.</p>
+      <p class="lead">Корма, добавки и сырьевые компоненты для КРС, птицы и домашних питомцев. Выберите направление в меню — увидите продукты на каждом этапе, их пользу и окупаемость.</p>
     </div>
     <div class="stats">
       <div class="stat"><b>30 лет</b><span>на рынке</span></div>
@@ -222,7 +255,7 @@ footer{background:var(--navy);color:var(--navy-ink);margin-top:30px;padding:28px
   </div>
 </header>
 
-<section class="mission">
+<section class="mission" id="mission">
   <div class="wrap mission-in">
     <div class="mission-text">
       <div class="eyebrow">Главная задача Алникор</div>
@@ -237,22 +270,8 @@ footer{background:var(--navy);color:var(--navy-ink);margin-top:30px;padding:28px
   </div>
 </section>
 
-<div class="tabs-bar">
-  <div class="wrap">
-    <div class="tabs" role="tablist" id="tabs"></div>
-    <div class="search"><label for="q" class="src">Поиск</label><input id="q" type="search" placeholder="Найти продукт или задачу: печень, кетоз, диарея, хелат…"></div>
-  </div>
-</div>
-
 <main class="wrap">
   <section id="panel" class="panel" aria-live="polite"></section>
-
-  <section class="tech" id="sales">
-    <h2>Ваша выгода: что даёт продукт и когда он окупается</h2>
-    <p>Выберите направление: ваши задачи, наше решение, польза в цифрах каталога и калькулятор окупаемости на цифрах вашего хозяйства.</p>
-    <div class="tabs" role="tablist" id="talk-tabs" style="padding-top:0"></div>
-    <div id="talk"></div>
-  </section>
 
   <section class="tech" id="calving">
     <h2>Отёл: три недели до и три недели после</h2>
@@ -320,6 +339,13 @@ footer{background:var(--navy);color:var(--navy-ink);margin-top:30px;padding:28px
       <p>15 000 кг на корову в год — не средний показатель ни одной страны, а уровень отдельных лучших ферм. Израиль в среднем даёт около 12 600 л, США — около 11 000 кг. К этому потолку Алникор и стремится вместе с хозяйствами.</p>
       <span class="src">Источники: Минсельхоз Израиля (2025, через JNS); USDA NASS, 24 390 фунтов на корову за 2025 г.; БГАТУ по данным Минсельхозпрода РБ; The DairyNews (СПК «Свислочь»); журнал M2 (ферма Цеэлим).</span>
     </div>
+  </section>
+
+  <section class="tech" id="sales">
+    <h2 id="sales-title">Ваша выгода: что даёт продукт и когда он окупается</h2>
+    <p id="sales-sub">Ваши задачи, наше решение, польза в цифрах каталога и калькулятор окупаемости на цифрах вашего хозяйства.</p>
+    <div class="tabs" role="tablist" id="talk-tabs" style="padding-top:0"></div>
+    <div id="talk"></div>
   </section>
 
   <section class="tech" id="tech">
@@ -394,13 +420,14 @@ footer{background:var(--navy);color:var(--navy-ink);margin-top:30px;padding:28px
   </div>
 </footer>
 
-<script src="data.js?v=7"></script>
+<script src="data.js?v=8"></script>
 <script>
 const TAGS={chel:['t-chel','хелаты'],rumen:['t-rumen','рубцовая защита'],prol:['t-prol','пролонг']};
 
-let state={animal:'cattle',stage:'calf',q:''};
+let state={route:'home',sub:{},q:''};
 const $=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const SEC=id=>SECTIONS.find(x=>x.id===id);
 
 function card(p){
   const tags=p.t.map(k=>`<span class="tag ${TAGS[k][0]}">${TAGS[k][1]}</span>`).join('');
@@ -412,40 +439,60 @@ function groups(list){
   list.forEach(p=>{if(!map[p.g]){map[p.g]=[];order.push(p.g)}map[p.g].push(p)});
   return order.map(g=>`<div class="group"><h3>${esc(g)} <small>${map[g].length}</small></h3><div class="cards">${map[g].map(card).join('')}</div></div>`).join('');
 }
-function renderTabs(){
-  $('#tabs').innerHTML=ANIMALS.map(a=>`<button class="tab" role="tab" id="tab-${a.id}" aria-selected="${!state.q&&a.id===state.animal}" data-a="${a.id}"><span class="emo" aria-hidden="true">${a.emo}</span>${esc(a.name)}</button>`).join('');
-  document.querySelectorAll('#tabs .tab').forEach(b=>b.onclick=()=>{state.q='';$('#q').value='';location.hash=b.dataset.a;go(b.dataset.a)});
+function ladder(){
+  return `<div class="group"><h3>Классы кормов <small>от премиальных к базовым</small></h3><div class="ladder">${PET_LADDER.map(r=>`<div class="rung"><b>${r[0]}</b><div><div class="bar" style="width:${r[1]}%" aria-hidden="true"></div><span>${esc(r[2])}</span></div><span>${esc(r[3])}</span></div>`).join('')}</div></div>`;
 }
+function renderNav(){
+  $('#nav').innerHTML=SECTIONS.map(x=>`<a href="#${x.id}" ${!state.q&&state.route===x.id?'aria-current="page"':''}>${x.emo} ${esc(x.name)}${x.soon?'<span class="soon">скоро</span>':''}</a>`).join('');
+}
+function show(id,on){const el=document.getElementById(id);if(el)el.classList.toggle('hidden',!on)}
 function renderPanel(){
   const el=$('#panel');
   if(state.q){
     const q=state.q.toLowerCase();
     const hits=P.filter(p=>(p.n+' '+p.w+' '+p.b+' '+p.d).toLowerCase().includes(q));
+    const where=a=>SECTIONS.find(x=>x.subs.some(su=>su.a===a));
+    const secs=SECTIONS.filter(x=>hits.some(h=>where(h.a)===x));
     el.innerHTML=`<div class="panel-head"><div class="big-emo" aria-hidden="true">🔎</div><div><h2>Поиск: «${esc(state.q)}»</h2><p>Найдено продуктов: ${hits.length}</p></div></div>`+
-      (hits.length?ANIMALS.filter(a=>hits.some(h=>h.a===a.id)).map(a=>`<div class="group"><h3>${a.emo} ${esc(a.name)}</h3><div class="cards">${hits.filter(h=>h.a===a.id).map(card).join('')}</div></div>`).join(''):'<p class="empty">Ничего не нашлось. Попробуйте другое слово: печень, телята, жара, хелат.</p>');
+      (hits.length?secs.map(x=>`<div class="group"><h3>${x.emo} ${esc(x.name)}</h3><div class="cards">${hits.filter(h=>where(h.a)===x).map(card).join('')}</div></div>`).join(''):'<p class="empty">Ничего не нашлось. Попробуйте другое слово: печень, телята, жара, хелат.</p>');
     return;
   }
-  const a=ANIMALS.find(x=>x.id===state.animal);
-  const extra=a.id==='cattle'?'<a class="link-chip" href="#" id="to-calving">Отёл: три недели до и после, график лактации ↓</a>':'';
-  let html=`<div class="panel-head"><div class="big-emo" aria-hidden="true">${a.emo}</div><div><h2>${esc(a.title)}</h2><p>${esc(a.sub)}</p>${extra}</div></div>`;
-  if(a.stages){
-    html+=`<div class="stages">${a.stages.map(s=>`<button class="stage" aria-pressed="${s.id===state.stage}" data-s="${s.id}"><span class="s-emo" aria-hidden="true">${s.emo}</span><span class="s-when">${esc(s.when)}</span><span class="s-name">${esc(s.name)}</span></button>`).join('')}</div>`;
-    const st=a.stages.find(s=>s.id===state.stage);
-    html+=`<div class="stage-note">${esc(st.note)}</div><div class="cards">${P.filter(p=>p.a==='cattle'&&p.g===st.id).map(card).join('')}</div>`;
-  }else{
-    if(a.id==='dogs'||a.id==='cats'){
-      html+=`<div class="group"><h3>Классы кормов <small>от премиальных к базовым</small></h3><div class="ladder">${PET_LADDER.map(r=>`<div class="rung"><b>${r[0]}</b><div><div class="bar" style="width:${r[1]}%" aria-hidden="true"></div><span>${esc(r[2])}</span></div><span>${esc(r[3])}</span></div>`).join('')}</div></div>`;
-    }
-    html+=groups(P.filter(p=>p.a===a.id));
+  if(state.route==='home'){
+    el.innerHTML=`<p class="subnav-title">Направления</p><div class="dirs">${SECTIONS.map(x=>`<a class="dir" href="#${x.id}"><span class="d-emo" aria-hidden="true">${x.emo}</span><b>${esc(x.name)}</b><span>${esc(x.soon?x.sub+' Раздел в подготовке.':x.title)}</span><span class="go">${x.soon?'Скоро':'Открыть →'}</span></a>`).join('')}</div>`;
+    return;
   }
+  const x=SEC(state.route);
+  let html=`<div class="panel-head"><div class="big-emo" aria-hidden="true">${x.emo}</div><div><h2>${esc(x.title)}</h2><p>${esc(x.sub)}</p>${x.id==='cattle'?'<a class="link-chip" href="#" id="to-calving">Отёл: три недели до и после, график лактации ↓</a>':''}</div></div>`;
+  if(x.soon){
+    html+=`<div class="soon-box"><h3>Раздел в подготовке</h3><p>Ассортимент минеральных удобрений для теплиц скоро появится здесь. Чтобы узнать подробности уже сейчас, свяжитесь с Алникор: 8 (0152) 68-12-38, info@alnikor.by.</p></div>`;
+    el.innerHTML=html;return;
+  }
+  const subId=state.sub[x.id]||x.subs[0].id, su=x.subs.find(s=>s.id===subId)||x.subs[0];
+  if(x.subs.length>1){
+    html+=`<p class="subnav-title">Выберите ${x.id==='cattle'?'этап':'направление'}</p><div class="stages">${x.subs.map(s=>`<button class="stage" aria-pressed="${s.id===su.id}" data-s="${s.id}"><span class="s-emo" aria-hidden="true">${s.emo}</span><span class="s-when">${esc(s.when)}</span><span class="s-name">${esc(s.name)}</span></button>`).join('')}</div>`;
+  }
+  if(su.note)html+=`<div class="stage-note">${esc(su.note)}</div>`;
+  const list=P.filter(p=>p.a===su.a&&(!su.g||p.g===su.g));
+  if(su.ladder)html+=ladder();
+  html+=su.g?`<div class="cards">${list.map(card).join('')}</div>`:groups(list);
   el.innerHTML=html;
-  el.querySelectorAll('.stage').forEach(b=>b.onclick=()=>{state.stage=b.dataset.s;renderPanel()});
+  el.querySelectorAll('.stage').forEach(b=>b.onclick=()=>{state.sub[x.id]=b.dataset.s;renderPanel()});
   const tc=el.querySelector('#to-calving');
   if(tc)tc.onclick=e=>{e.preventDefault();document.getElementById('calving').scrollIntoView({behavior:'smooth'})};
 }
+function layout(){
+  const home=state.route==='home'&&!state.q, x=SEC(state.route), blocks=(x&&!state.q&&x.blocks)||[];
+  show('hero',home);show('mission',home);
+  show('calving',blocks.includes('calving'));
+  show('tech',home||blocks.includes('tech'));
+  show('forms',home||blocks.includes('forms'));
+  const talk=(x&&!state.q&&x.talk)||[];
+  show('sales',talk.length>0);
+  if(talk.length){if(!talk.includes(talkId))talkId=talk[0];try{renderTalk(talk)}catch(e){console.error(e)}}
+}
 function go(id){
-  if(!ANIMALS.some(a=>a.id===id))id='cattle';
-  state.animal=id;renderTabs();renderPanel();
+  state.route=(id&&SEC(id))?id:'home';
+  renderNav();renderPanel();layout();
 }
 function drawLactation(){
   const svg=$('#lac');const W=760,H=340,L=56,R=20,T=24,B=44,DAYS=420,MAXY=80,TH=20;
@@ -510,9 +557,11 @@ function renderChart(ch){
     return `<div class="bgroup"><h4>${esc(gr.title)}</h4>${gr.items.map(i=>`<div class="brow2"><span>${esc(i.l)}</span><div class="btrack2"><div class="bfill2 ${i.hi?'hi':''}" style="width:${Math.max(2,i.v/m*100)}%"></div></div><b>${esc(gr.fmt(i.v))}</b></div>`).join('')}</div>`}).join('')}</div>`;
 }
 let talkId='milk';
-function renderTalk(){
-  $('#talk-tabs').innerHTML=TALK.map(t=>`<button class="tab" role="tab" aria-selected="${t.id===talkId}" data-t="${t.id}"><span class="emo" aria-hidden="true">${t.emo}</span>${esc(t.name)}</button>`).join('');
-  $('#talk-tabs').querySelectorAll('.tab').forEach(b=>b.onclick=()=>{talkId=b.dataset.t;renderTalk()});
+function renderTalk(ids){
+  const items=TALK.filter(t=>ids.includes(t.id));
+  $('#talk-tabs').classList.toggle('hidden',items.length<2);
+  $('#talk-tabs').innerHTML=items.map(t=>`<button class="tab" role="tab" aria-selected="${t.id===talkId}" data-t="${t.id}"><span class="emo" aria-hidden="true">${t.emo}</span>${esc(t.name)}</button>`).join('');
+  $('#talk-tabs').querySelectorAll('.tab').forEach(b=>b.onclick=()=>{talkId=b.dataset.t;renderTalk(ids)});
   const t=TALK.find(x=>x.id===talkId);
   let h=`<div class="talk-grid">
     <div class="tbox pain"><h3>Ваши задачи</h3><ul>${t.pain.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
@@ -538,12 +587,11 @@ function renderTalk(){
     calc();
   });
 }
-try{renderTalk()}catch(e){console.error(e)}
 try{drawLactation()}catch(e){console.error(e)}
 
-$('#q').addEventListener('input',e=>{state.q=e.target.value.trim();renderTabs();renderPanel()});
-window.addEventListener('hashchange',()=>go(location.hash.slice(1)));
-go(location.hash.slice(1)||'cattle');
+$('#q').addEventListener('input',e=>{state.q=e.target.value.trim();renderNav();renderPanel();layout()});
+window.addEventListener('hashchange',()=>{state.q='';$('#q').value='';go(location.hash.slice(1));window.scrollTo(0,0)});
+go(location.hash.slice(1));
 </script>
 </body>
 </html>
