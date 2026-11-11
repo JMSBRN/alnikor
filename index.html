@@ -315,7 +315,7 @@ footer{background:var(--navy);color:var(--navy-ink);margin-top:30px;padding:28px
       <li><b>Готовая схема на каждый этап.</b> Продукт уже рассчитан под возраст и период — не нужно смешивать «на глаз».</li>
       <li><b>Дозу берёт само животное.</b> Через воду и дозатор корова пьёт сколько нужно и получает ровно свою дозу.</li>
       <li><b>Без пиков.</b> Пролонгированные и защищённые формы высвобождаются равномерно — организм работает ровно.</li>
-      <li><b>Контроль специалистов.</b> Анализ кормов, расчёт рационов и проверка на ферме в «Программе 15000+».</li>
+      <li><b>Контроль специалистов.</b> Анализ кормов, расчёт рационов и проверка на ферме в «Алникор Программе 15000+».</li>
     </ul>
   </div>
 </section>
@@ -407,7 +407,7 @@ footer{background:var(--navy);color:var(--navy-ink);margin-top:30px;padding:28px
         <div class="brow bench"><span>Израиль, в среднем (2025) — мировой лидер</span><div class="btrack"><div class="bfill" style="width:84%"></div></div><b>12 600 л</b></div>
         <div class="brow bench"><span>СПК «Свислочь», Гродненский р-н (прогноз 2025)</span><div class="btrack"><div class="bfill" style="width:91.3%"></div></div><b>~13 700 кг</b></div>
         <div class="brow bench"><span>Лучшая ферма Израиля (кибуц Цеэлим)</span><div class="btrack"><div class="bfill" style="width:99%"></div></div><b>14 858 кг</b></div>
-        <div class="brow bench"><span>Цель «Программы 15000+»</span><div class="btrack"><div class="bfill hi" style="width:100%"></div></div><b>15 000+ кг</b></div>
+        <div class="brow bench"><span>Цель «Алникор Программы 15000+»</span><div class="btrack"><div class="bfill hi" style="width:100%"></div></div><b>15 000+ кг</b></div>
       </div>
       <p>15 000 кг на корову в год — не средний показатель ни одной страны, а уровень отдельных лучших ферм. Израиль в среднем даёт около 12 600 л, США — около 11 000 кг. К этому потолку Алникор и стремится вместе с хозяйствами.</p>
       <span class="src">Источники: Минсельхоз Израиля (2025, через JNS); USDA NASS, 24 390 фунтов на корову за 2025 г.; БГАТУ по данным Минсельхозпрода РБ; The DairyNews (СПК «Свислочь»); журнал M2 (ферма Цеэлим).</span>
@@ -486,7 +486,7 @@ footer{background:var(--navy);color:var(--navy-ink);margin-top:30px;padding:28px
   </div>
 </footer>
 
-<script src="data.js?v=12"></script>
+<script src="data.js?v=13"></script>
 <script>
 const TAGS={chel:['t-chel','хелаты'],rumen:['t-rumen','рубцовая защита'],prol:['t-prol','пролонг']};
 
@@ -580,7 +580,7 @@ function drawLactation(){
   g+=`<line x1="${L}" x2="${W-R}" y1="${y(TH)}" y2="${y(TH)}" stroke="var(--accent-ink)" stroke-width="1.5" stroke-dasharray="7 5"/><text x="${L+8}" y="${y(TH)-6}" font-size="12" font-weight="700" fill="var(--accent-ink)">порог запуска ~${TH} л</text>`;
   g+=`<path d="${path(Bc)}" fill="none" stroke="var(--ink-soft)" stroke-width="3.5"/><path d="${path(A)}" fill="none" stroke="var(--accent)" stroke-width="4.5"/>`;
   const cA=cross(A),cB=cross(Bc);
-  g+=`<circle cx="${x(50)}" cy="${y(65)}" r="6" fill="var(--accent)"/><text x="${x(50)+10}" y="${y(65)-8}" font-size="13" font-weight="800" fill="var(--accent-ink)">пик 65 л · цель «15000+»</text>`;
+  g+=`<circle cx="${x(50)}" cy="${y(65)}" r="6" fill="var(--accent)"/><text x="${x(50)+10}" y="${y(65)-8}" font-size="13" font-weight="800" fill="var(--accent-ink)">пик 65 л · цель «Алникор Программа 15000+»</text>`;
   g+=`<circle cx="${x(70)}" cy="${y(40)}" r="6" fill="var(--ink-soft)"/><text x="${x(70)+10}" y="${y(40)-10}" font-size="13" font-weight="700" fill="var(--ink-soft)">пик 40 л · «своим ходом»</text>`;
   if(cB)g+=`<circle cx="${x(cB)}" cy="${y(TH)}" r="5" fill="var(--ink)"/><text x="${x(cB)}" y="${y(TH)+20}" text-anchor="middle" font-size="12" fill="var(--ink)">запуск ~${cB} д.</text>`;
   svg.innerHTML=g;
