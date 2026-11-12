@@ -532,9 +532,15 @@ function renderPanel(){
   $('#sechead').innerHTML=`<div class="panel-head"><div class="big-emo" aria-hidden="true">${x.emo}</div><div><h2>${esc(x.title)}</h2><p>${esc(x.sub)}</p></div></div>`;
   let html=`<h2 class="list-title">Продукты</h2>`;
   if(x.soon){
-    html='';html+=`<div class="dirs">${(x.soonSubs||[]).map(su=>`<div class="dir"><span class="d-emo" aria-hidden="true">${su.emo}</span><b>${esc(su.name)}</b><span>${esc(su.text)}</span><span class="go">Раздел в подготовке</span></div>`).join('')}</div>
-    <div class="soon-box" style="margin-top:14px"><p>Ассортимент скоро появится здесь. Чтобы узнать подробности уже сейчас, свяжитесь с Алникор: 8 (0152) 68-12-38, info@alnikor.by.</p></div>`;
-    el.innerHTML=html;return;
+    let h2='';
+    if(x.subs.length){const sid=state.sub[x.id]||x.subs[0].id, su=x.subs.find(s=>s.id===sid)||x.subs[0];
+      h2+=`<p class="subnav-title">Выберите тип выращивания</p><div class="stages">${x.subs.map(s=>`<button class="stage" aria-pressed="${s.id===su.id}" data-s="${s.id}"><span class="s-emo" aria-hidden="true">${s.emo}</span><span class="s-when">${esc(s.when)}</span><span class="s-name">${esc(s.name)}</span></button>`).join('')}</div>`;
+      h2+=`<div class="stage-note">${esc(su.note)}</div>`;
+      if(su.tasks)h2+=`<div class="group"><h3>Какие задачи решаем</h3><div class="cards">${su.tasks.map(t=>`<article class="card"><p class="benefit" style="margin:0">${esc(t)}</p></article>`).join('')}</div></div>`;}
+    h2+=`<div class="soon-box"><h3>Ассортимент в подготовке</h3><p>Продукты Алникор для растениеводства скоро появятся здесь. Чтобы получить подбор питания под вашу культуру уже сейчас, свяжитесь с Алникор: 8 (0152) 68-12-38, info@alnikor.by.</p></div>`;
+    el.innerHTML=h2;
+    el.querySelectorAll('.stage').forEach(b=>b.onclick=()=>{state.sub[x.id]=b.dataset.s;renderPanel()});
+    return;
   }
   const subId=state.sub[x.id]||x.subs[0].id, su=x.subs.find(s=>s.id===subId)||x.subs[0];
   if(x.subs.length>1){
