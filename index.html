@@ -60,17 +60,18 @@ button{font:inherit;color:inherit}
 
 /* Верхнее меню */
 .topnav{position:sticky;top:0;z-index:10;background:var(--navy);border-bottom:1px solid rgba(255,255,255,.12)}
-.topnav-in{display:flex;align-items:center;gap:16px;padding-top:10px;padding-bottom:10px}
+.topnav .wrap{max-width:1480px}
+.topnav-in{display:flex;align-items:center;gap:20px;padding-top:10px;padding-bottom:10px}
 .logo{font-family:var(--display);font-weight:800;font-size:20px;color:var(--navy-ink);text-decoration:none;flex:0 0 auto}
-.navlinks{display:flex;gap:4px;overflow-x:auto;flex:1;scrollbar-width:none}
-.navlinks a{flex:0 0 auto;color:var(--navy-soft);text-decoration:none;font-weight:700;font-size:15px;padding:8px 12px;border-radius:10px;white-space:nowrap}
+.navlinks{display:flex;gap:2px;flex:1 1 auto;min-width:0;justify-content:center;overflow-x:auto;scrollbar-width:none}
+.navlinks a{flex:0 0 auto;color:var(--navy-soft);text-decoration:none;font-weight:700;font-size:15px;padding:8px 11px;border-radius:10px;white-space:nowrap}
 .navlinks a:hover{color:var(--navy-ink);background:rgba(255,255,255,.08)}
 .navlinks a[aria-current="page"]{color:var(--navy);background:#F59A62}
 .navlinks .soon{font-size:11px;font-weight:800;margin-left:4px;opacity:.8}
-#q{flex:0 1 260px;min-width:120px;font:inherit;font-size:14px;padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:var(--navy-ink)}
+#q{flex:0 0 230px;min-width:0;font:inherit;font-size:14px;padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:var(--navy-ink)}
 #q::placeholder{color:var(--navy-soft)}
 .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
-@media (max-width:760px){.topnav-in{flex-wrap:wrap}.navlinks{order:3;flex-basis:100%}#q{flex:1}}
+@media (max-width:1280px){.topnav-in{flex-wrap:wrap;row-gap:8px}.navlinks{order:3;flex-basis:100%;justify-content:flex-start}#q{flex:1 1 200px;max-width:420px;margin-left:auto}}
 .subnav-title{font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);margin:0 0 8px}
 .dirs{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
 .dir{display:flex;flex-direction:column;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;text-decoration:none;color:var(--ink);transition:border-color .15s, transform .15s}
@@ -486,7 +487,7 @@ footer{background:var(--navy);color:var(--navy-ink);margin-top:30px;padding:28px
   </div>
 </footer>
 
-<script src="data.js?v=16"></script>
+<script src="data.js?v=17"></script>
 <script>
 const TAGS={chel:['t-chel','хелаты'],rumen:['t-rumen','рубцовая защита'],prol:['t-prol','пролонг']};
 
@@ -509,7 +510,7 @@ function ladder(){
   return `<div class="group"><h3>Классы кормов <small>от премиальных к базовым</small></h3><div class="ladder">${PET_LADDER.map(r=>`<div class="rung"><b>${r[0]}</b><div><div class="bar" style="width:${r[1]}%" aria-hidden="true"></div><span>${esc(r[2])}</span></div><span>${esc(r[3])}</span></div>`).join('')}</div></div>`;
 }
 function renderNav(){
-  $('#nav').innerHTML=SECTIONS.map(x=>`<a href="#${x.id}" ${!state.q&&state.route===x.id?'aria-current="page"':''}>${x.emo} ${esc(x.name)}${x.soon?'<span class="soon">скоро</span>':''}</a>`).join('');
+  $('#nav').innerHTML=SECTIONS.map(x=>`<a href="#${x.id}" ${!state.q&&state.route===x.id?'aria-current="page"':''}>${x.emo} ${esc(x.name)}</a>`).join('');
 }
 function show(id,on){const el=document.getElementById(id);if(el)el.classList.toggle('hidden',!on)}
 function renderPanel(){
@@ -525,7 +526,7 @@ function renderPanel(){
     return;
   }
   if(state.route==='home'){
-    el.innerHTML=`<p class="subnav-title">Направления</p><div class="dirs">${SECTIONS.map(x=>`<a class="dir" href="#${x.id}"><span class="d-emo" aria-hidden="true">${x.emo}</span><b>${esc(x.name)}</b><span>${esc(x.soon?x.sub+' Раздел в подготовке.':x.title)}</span><span class="go">${x.soon?'Скоро':'Открыть →'}</span></a>`).join('')}</div>`;
+    el.innerHTML=`<p class="subnav-title">Направления</p><div class="dirs">${SECTIONS.map(x=>`<a class="dir" href="#${x.id}"><span class="d-emo" aria-hidden="true">${x.emo}</span><b>${esc(x.name)}</b><span>${esc(x.soon?x.sub+' Раздел в подготовке.':x.title)}</span><span class="go">Открыть →</span></a>`).join('')}</div>`;
     return;
   }
   const x=SEC(state.route);
